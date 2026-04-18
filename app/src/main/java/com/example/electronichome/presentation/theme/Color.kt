@@ -1,4 +1,4 @@
-package com.example.electronichome.ui.theme
+package com.example.electronichome.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
