@@ -3,6 +3,7 @@ package com.example.electronichome.presentation.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -19,65 +20,66 @@ fun HomeScreen(
     navController: NavController,
     viewModel: ApartmentsViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
-    val approvedApt = state.apartments.firstOrNull { it.status == "APPROVED" }
+    val state     by viewModel.state.collectAsState()
+    val primaryId by viewModel.primaryId.collectAsState()
+
+    val primaryApt = state.apartments.firstOrNull { it.id == primaryId }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Surface(color = MaterialTheme.colorScheme.primary) {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 24.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
-                if (approvedApt != null) {
-                    Row(verticalAlignment = androidx.compose.ui.Alignment.Bottom) {
+                if (primaryApt != null) {
+                    Row(verticalAlignment = Alignment.Bottom) {
                         Text(
-                            text = approvedApt.apartment,
-                            fontSize = 64.sp,
+                            text       = primaryApt.apartment,
+                            fontSize   = 64.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color      = Color.White,
                             lineHeight = 64.sp
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "квартира",
+                            text     = "квартира",
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.White.copy(alpha = 0.85f),
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            color    = Color.White.copy(alpha = 0.85f),
+                            modifier = Modifier.padding(bottom = 10.dp)
                         )
                     }
                     Text(
                         text = buildString {
-                            append("г. ${approvedApt.city}, ${approvedApt.street}, ")
-                            append("д. ${approvedApt.house}")
-                            approvedApt.building?.let { append(", корп. $it") }
-                            append(", эт. ${approvedApt.floor}")
+                            append("г. ${primaryApt.city}, ${primaryApt.street}, ")
+                            append("д. ${primaryApt.house}")
+                            primaryApt.building?.let { append(", корп. $it") }
+                            append(", эт. ${primaryApt.floor}")
                         },
                         fontSize = 13.sp,
-                        color = Color.White.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(top = 4.dp)
+                        color    = Color.White.copy(alpha = 0.8f)
                     )
-                    approvedApt.accountNumber?.let {
-                        Spacer(Modifier.height(8.dp))
+                    primaryApt.accountNumber?.let {
+                        Spacer(Modifier.height(6.dp))
                         Text(
-                            text = "Л/С: $it",
+                            text     = "Л/С: $it",
                             fontSize = 13.sp,
-                            color = Color.White.copy(alpha = 0.7f)
+                            color    = Color.White.copy(alpha = 0.7f)
                         )
                     }
                 } else {
                     Text(
-                        text = "Электронный дом",
-                        fontSize = 24.sp,
+                        text       = "Электронный дом",
+                        fontSize   = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color      = Color.White
                     )
                     Text(
-                        text = if (state.apartments.isEmpty()) "Добавьте квартиру в разделе «Квартиры»"
-                        else "Квартира ожидает подтверждения УК",
+                        text     = if (state.apartments.isEmpty())
+                            "Добавьте квартиру в разделе Профиль → Квартиры"
+                        else "Выберите основную квартиру в разделе Квартиры",
                         fontSize = 13.sp,
-                        color = Color.White.copy(alpha = 0.8f),
+                        color    = Color.White.copy(alpha = 0.8f),
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -86,7 +88,7 @@ fun HomeScreen(
 
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Быстрые действия",
+                text  = "Быстрые действия",
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -1,5 +1,6 @@
 package com.example.electronichome.presentation.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -8,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.example.electronichome.presentation.auth.LoginScreen
@@ -15,6 +17,7 @@ import com.example.electronichome.presentation.auth.RegisterScreen
 import com.example.electronichome.presentation.apartments.AddApartmentScreen
 import com.example.electronichome.presentation.screens.AnnouncementsScreen
 import com.example.electronichome.presentation.apartments.ApartmentsScreen
+import com.example.electronichome.presentation.apartments.ApartmentsViewModel
 import com.example.electronichome.presentation.home.HomeScreen
 import com.example.electronichome.presentation.screens.MetersScreen
 import com.example.electronichome.presentation.screens.ProfileScreen
@@ -35,6 +38,7 @@ val bottomNavItems = listOf(
 
 private val bottomBarRoutes = bottomNavItems.map { it.route }.toSet()
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
 fun AppNavGraph(navController: NavHostController) {
     val startDestination = if (FirebaseAuth.getInstance().currentUser != null)
@@ -93,12 +97,18 @@ fun AppNavGraph(navController: NavHostController) {
             }
 
             composable(Screen.Home.route) {
-                HomeScreen(navController = navController)
+                val viewModel: ApartmentsViewModel = hiltViewModel(
+                    remember { navController.getBackStackEntry(Screen.Home.route) }
+                )
+                HomeScreen(navController = navController, viewModel = viewModel)
             }
             composable(Screen.Announcements.route) {
                 AnnouncementsScreen()
             }
             composable(Screen.Profile.route) {
+                val viewModel: ApartmentsViewModel = hiltViewModel(
+                    remember { navController.getBackStackEntry(Screen.Home.route) }
+                )
                 ProfileScreen(
                     onNavigateToApartments = {
                         navController.navigate(Screen.Apartments.route)
@@ -113,14 +123,23 @@ fun AppNavGraph(navController: NavHostController) {
             }
 
             composable(Screen.Apartments.route) {
+                val viewModel: ApartmentsViewModel = hiltViewModel(
+                    remember { navController.getBackStackEntry(Screen.Home.route) }
+                )
                 ApartmentsScreen(
-                    onAddApartment = { navController.navigate(Screen.AddApartment.route) }
+                    onAddApartment = { navController.navigate(Screen.AddApartment.route) },
+                    onNavigateBack = { navController.popBackStack() },
+                    viewModel = viewModel
                 )
             }
             composable(Screen.AddApartment.route) {
+                val viewModel: ApartmentsViewModel = hiltViewModel(
+                    remember { navController.getBackStackEntry(Screen.Home.route) }
+                )
                 AddApartmentScreen(
                     onSuccess      = { navController.popBackStack() },
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = { navController.popBackStack() },
+                    viewModel = viewModel
                 )
             }
             composable(Screen.Meters.route) {
