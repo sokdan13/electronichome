@@ -1,6 +1,7 @@
 package com.example.electronichome.di
 
 
+import com.example.electronichome.data.repository.ApartmentRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -18,4 +19,8 @@ object AppModule {
 
     @Provides @Singleton
     fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideApartmentRepository(): ApartmentRepository = ApartmentRepository()
 }
