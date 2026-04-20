@@ -56,7 +56,6 @@ class AuthViewModel @Inject constructor(
             _state.value = AuthState(isLoading = true)
             try {
                 val result = auth.createUserWithEmailAndPassword(email, password).await()
-                // Сохраняем displayName в Firebase профиле
                 val profileUpdate = UserProfileChangeRequest.Builder()
                     .setDisplayName("$firstName $lastName")
                     .build()

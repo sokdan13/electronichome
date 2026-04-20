@@ -14,12 +14,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.example.electronichome.presentation.auth.LoginScreen
 import com.example.electronichome.presentation.auth.RegisterScreen
-import com.example.electronichome.presentation.apartments.AddApartmentScreen
 import com.example.electronichome.presentation.screens.AnnouncementsScreen
 import com.example.electronichome.presentation.apartments.ApartmentsScreen
 import com.example.electronichome.presentation.apartments.ApartmentsViewModel
 import com.example.electronichome.presentation.home.HomeScreen
-import com.example.electronichome.presentation.screens.MetersScreen
+import com.example.electronichome.presentation.meters.MetersScreen
 import com.example.electronichome.presentation.screens.ProfileScreen
 import com.example.electronichome.presentation.screens.RequestsScreen
 import com.google.firebase.auth.FirebaseAuth
@@ -132,19 +131,21 @@ fun AppNavGraph(navController: NavHostController) {
                     viewModel = viewModel
                 )
             }
-            composable(Screen.AddApartment.route) {
-                val viewModel: ApartmentsViewModel = hiltViewModel(
-                    remember { navController.getBackStackEntry(Screen.Home.route) }
-                )
-                AddApartmentScreen(
-                    onSuccess      = { navController.popBackStack() },
-                    onNavigateBack = { navController.popBackStack() },
-                    viewModel = viewModel
-                )
-            }
             composable(Screen.Meters.route) {
-                MetersScreen(onNavigateBack = { navController.popBackStack() })
+                val parentEntry = remember { navController.getBackStackEntry(Screen.Home.route) }
+                val apartmentsVm: ApartmentsViewModel = hiltViewModel(parentEntry)
+                val state by apartmentsVm.state.collectAsState()
+                val primaryId by apartmentsVm.primaryId.collectAsState()
+                val apartment = state.apartments.firstOrNull { it.id == primaryId }
+
+                if (apartment != null) {
+                    MetersScreen(
+                        apartment      = apartment,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
             }
+
             composable(Screen.Requests.route) {
                 RequestsScreen(onNavigateBack = { navController.popBackStack() })
             }
