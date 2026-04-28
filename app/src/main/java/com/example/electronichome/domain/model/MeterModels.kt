@@ -1,7 +1,9 @@
 package com.example.electronichome.domain.model
 
+import android.annotation.SuppressLint
 import kotlinx.serialization.Serializable
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class MeterReadingRequest(
     val apartmentId: String,
@@ -15,6 +17,7 @@ data class MeterReadingRequest(
     val elecPeak: Double? = null
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class MeterReadingResponse(
     val id: String,

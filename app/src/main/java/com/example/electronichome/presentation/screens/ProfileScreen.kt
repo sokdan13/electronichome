@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun ProfileScreen(
     onNavigateToApartments: () -> Unit,
+    onNavigateToRequests: () -> Unit,
     onLogout: () -> Unit
 ) {
     val user = FirebaseAuth.getInstance().currentUser
@@ -80,7 +81,7 @@ fun ProfileScreen(
                 icon     = Icons.Outlined.Home,
                 title    = "Мои заявки",
                 subtitle = "История обращений",
-                onClick  = {}
+                onClick  = onNavigateToRequests
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
             ProfileMenuItem(

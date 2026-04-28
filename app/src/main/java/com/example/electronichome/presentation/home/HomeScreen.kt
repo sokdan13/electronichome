@@ -105,6 +105,12 @@ fun HomeScreen(
                     modifier = Modifier.weight(1f),
                     onClick  = { navController.navigate(Screen.Meters.route) }
                 )
+                QuickActionCard(
+                    title   = "Заявки",
+                    icon    = Icons.Outlined.Home,
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate(Screen.Requests.route) }
+                )
             }
         }
 

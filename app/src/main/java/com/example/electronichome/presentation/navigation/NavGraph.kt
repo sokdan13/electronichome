@@ -20,7 +20,7 @@ import com.example.electronichome.presentation.apartments.ApartmentsViewModel
 import com.example.electronichome.presentation.home.HomeScreen
 import com.example.electronichome.presentation.meters.MetersScreen
 import com.example.electronichome.presentation.screens.ProfileScreen
-import com.example.electronichome.presentation.screens.RequestsScreen
+import com.example.electronichome.presentation.requests.RequestsScreen
 import com.google.firebase.auth.FirebaseAuth
 
 data class BottomNavItem(
@@ -112,6 +112,9 @@ fun AppNavGraph(navController: NavHostController) {
                     onNavigateToApartments = {
                         navController.navigate(Screen.Apartments.route)
                     },
+                    onNavigateToRequests = {
+                        navController.navigate(Screen.Requests.route)
+                    },
                     onLogout = {
                         FirebaseAuth.getInstance().signOut()
                         navController.navigate(Screen.Login.route) {
@@ -147,7 +150,18 @@ fun AppNavGraph(navController: NavHostController) {
             }
 
             composable(Screen.Requests.route) {
-                RequestsScreen(onNavigateBack = { navController.popBackStack() })
+                val parentEntry = remember { navController.getBackStackEntry(Screen.Home.route) }
+                val apartmentsVm: ApartmentsViewModel = hiltViewModel(parentEntry)
+                val state by apartmentsVm.state.collectAsState()
+                val primaryId by apartmentsVm.primaryId.collectAsState()
+                val apartment = state.apartments.firstOrNull { it.id == primaryId }
+
+                if (apartment != null) {
+                    RequestsScreen(
+                        apartment      = apartment,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
             }
         }
     }
