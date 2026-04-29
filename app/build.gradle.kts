@@ -85,6 +85,10 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
 
     implementation("androidx.compose.material:material:1.6.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    implementation("com.google.zxing:core:3.5.3")
+    implementation("androidx.compose.ui:ui-graphics")
 
 
 
