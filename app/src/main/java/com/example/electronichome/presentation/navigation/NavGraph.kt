@@ -8,15 +8,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.example.electronichome.presentation.auth.LoginScreen
 import com.example.electronichome.presentation.auth.RegisterScreen
-import com.example.electronichome.presentation.screens.AnnouncementsScreen
+import com.example.electronichome.presentation.announcements.AnnouncementsScreen
 import com.example.electronichome.presentation.apartments.ApartmentsScreen
 import com.example.electronichome.presentation.apartments.ApartmentsViewModel
+import com.example.electronichome.presentation.guestpass.GuestPassScreen
 import com.example.electronichome.presentation.home.HomeScreen
 import com.example.electronichome.presentation.meters.MetersScreen
 import com.example.electronichome.presentation.screens.ProfileScreen
@@ -50,7 +52,9 @@ fun AppNavGraph(navController: NavHostController) {
         contentWindowInsets = WindowInsets(0),
         bottomBar = {
             if (currentRoute in bottomBarRoutes) {
-                NavigationBar {
+                NavigationBar(
+                    containerColor = Color(0x00FFFFFF),
+                ){
                     bottomNavItems.forEach { item ->
                         NavigationBarItem(
                             selected = currentRoute == item.route,
@@ -124,6 +128,7 @@ fun AppNavGraph(navController: NavHostController) {
                 )
             }
 
+
             composable(Screen.Apartments.route) {
                 val viewModel: ApartmentsViewModel = hiltViewModel(
                     remember { navController.getBackStackEntry(Screen.Home.route) }
@@ -158,6 +163,21 @@ fun AppNavGraph(navController: NavHostController) {
 
                 if (apartment != null) {
                     RequestsScreen(
+                        apartment      = apartment,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
+            composable(Screen.GuestPass.route) {
+                val parentEntry  = remember { navController.getBackStackEntry(Screen.Home.route) }
+                val apartmentsVm: ApartmentsViewModel = hiltViewModel(parentEntry)
+                val state        by apartmentsVm.state.collectAsState()
+                val primaryId    by apartmentsVm.primaryId.collectAsState()
+                val apartment    = state.apartments.firstOrNull { it.id == primaryId }
+
+                if (apartment != null) {
+                    GuestPassScreen(
                         apartment      = apartment,
                         onNavigateBack = { navController.popBackStack() }
                     )

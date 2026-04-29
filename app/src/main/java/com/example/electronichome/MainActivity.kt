@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(
                 Color(0xFFF57C00).toArgb()
@@ -35,6 +36,10 @@ class MainActivity : ComponentActivity() {
                 Color(0xFFFFFFFF).toArgb()
             )
         )
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE)
+        }
 
         setContent {
             ElectronichomeTheme {

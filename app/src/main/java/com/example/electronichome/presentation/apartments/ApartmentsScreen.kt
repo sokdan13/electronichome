@@ -207,7 +207,10 @@ fun ApartmentCard(apt: ApartmentResponse) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFD5E0EC)
+        )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

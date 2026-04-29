@@ -150,7 +150,10 @@ private fun RequestForm(
 
     Card(
         modifier  = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFD5E0EC)
+        )
     ) {
         Column(
             modifier = Modifier
@@ -274,7 +277,10 @@ private fun RequestCard(req: RequestResponse) {
 
     Card(
         modifier  = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFD5E0EC)
+        )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(

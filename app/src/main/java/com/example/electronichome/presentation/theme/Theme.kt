@@ -9,9 +9,9 @@ val OrangeOnPrimary  = Color(0xFFFFFFFF)
 val OrangeContainer  = Color(0xFFFFE0B2)
 
 val BluePrimary      = Color(0xFF0277BD)
-val BlueOnPrimary    = Color(0xFFFFFFFF)
+val BlueOnPrimary    = Color(0xFFD5E0EC)
 val BlueContainer    = Color(0xFFB3E5FC)
-val BlueSurface      = Color(0xFFE1F5FE)
+val BlueSurface      = Color(0xFFD5E0EC)
 
 private val LightColorScheme = lightColorScheme(
     primary          = OrangePrimary,

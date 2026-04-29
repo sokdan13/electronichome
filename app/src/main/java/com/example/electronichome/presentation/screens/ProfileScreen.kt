@@ -83,13 +83,6 @@ fun ProfileScreen(
                 subtitle = "История обращений",
                 onClick  = onNavigateToRequests
             )
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-            ProfileMenuItem(
-                icon     = Icons.Outlined.Notifications,
-                title    = "Уведомления",
-                subtitle = "Настройки оповещений",
-                onClick  = {}
-            )
         }
 
         Spacer(Modifier.weight(1f))
