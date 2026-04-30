@@ -1,8 +1,9 @@
 package com.example.electronichome.presentation.auth
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.electronichome.data.local.UserRole
+import com.example.electronichome.data.local.UserRoleManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,14 +15,16 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 data class AuthState(
-    val isLoading: Boolean = false,
-    val error: String?     = null,
-    val isSuccess: Boolean = false
+    val isLoading: Boolean  = false,
+    val error: String?      = null,
+    val isSuccess: Boolean  = false,
+    val role: UserRole?     = null
 )
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val roleManager: UserRoleManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthState())
@@ -36,7 +39,8 @@ class AuthViewModel @Inject constructor(
             _state.value = AuthState(isLoading = true)
             try {
                 auth.signInWithEmailAndPassword(email, password).await()
-                _state.value = AuthState(isSuccess = true)
+                val role     = roleManager.getRole()
+                _state.value = AuthState(isSuccess = true, role = role)
             } catch (e: Exception) {
                 _state.value = AuthState(error = e.localizedMessage ?: "Ошибка входа")
             }
@@ -60,7 +64,7 @@ class AuthViewModel @Inject constructor(
                     .setDisplayName("$firstName $lastName")
                     .build()
                 result.user?.updateProfile(profileUpdate)?.await()
-                _state.value = AuthState(isSuccess = true)
+                _state.value = AuthState(isSuccess = true, role = UserRole.RESIDENT)
             } catch (e: Exception) {
                 _state.value = AuthState(error = e.localizedMessage ?: "Ошибка регистрации")
             }

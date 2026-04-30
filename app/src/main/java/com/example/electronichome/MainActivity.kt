@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.electronichome.presentation.navigation.AppNavGraph
@@ -36,10 +37,10 @@ class MainActivity : ComponentActivity() {
                 Color(0xFFFFFFFF).toArgb()
             )
         )
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, window.decorView).apply {
-            hide(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE)
-        }
+//        WindowCompat.setDecorFitsSystemWindows(window, false)
+//        WindowInsetsControllerCompat(window, window.decorView).apply {
+//            hide(WindowInsetsCompat.Type.NAVIGATION_BARS)
+//        }
 
         setContent {
             ElectronichomeTheme {

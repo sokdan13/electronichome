@@ -3,7 +3,9 @@ package com.example.electronichome.di
 
 import android.content.Context
 import com.example.electronichome.data.local.ApartmentPrefs
+import com.example.electronichome.data.local.UserRoleManager
 import com.example.electronichome.data.repository.ApartmentRepository
+import com.example.electronichome.data.repository.ManagementRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -23,6 +25,9 @@ object AppModule {
     @Provides @Singleton
     fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 
+    @Provides @Singleton
+    fun provideUserRoleManager(): UserRoleManager = UserRoleManager()
+
     @Provides
     @Singleton
     fun provideApartmentRepository(): ApartmentRepository = ApartmentRepository()
@@ -32,4 +37,8 @@ object AppModule {
     fun provideApartmentPrefs(
         @ApplicationContext context: Context
     ): ApartmentPrefs = ApartmentPrefs(context)
+
+    @Provides
+    @Singleton
+    fun provideManagementRepository(): ManagementRepository = ManagementRepository()
 }

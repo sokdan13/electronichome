@@ -105,7 +105,10 @@ fun ApartmentCard(
     Card(
         modifier  = Modifier.fillMaxWidth(),
         border    = if (isPrimary) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFD5E0EC)
+        )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -193,79 +196,6 @@ fun ApartmentCard(
                 ) {
                     Text("Сделать основной")
                 }
-            }
-        }
-    }
-}
-@Composable
-fun ApartmentCard(apt: ApartmentResponse) {
-    val (statusColor, statusText) = when (apt.status) {
-        "APPROVED" -> MaterialTheme.colorScheme.primary to "Подтверждено"
-        "REJECTED" -> MaterialTheme.colorScheme.error to "Отклонено"
-        else       -> MaterialTheme.colorScheme.secondary to "Ожидает проверки"
-    }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFD5E0EC)
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = if (apt.status == "APPROVED") apt.apartment else "—",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (apt.status == "APPROVED") MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = buildString {
-                        append("${apt.street}, д. ${apt.house}")
-                        apt.building?.let { append(", корп. $it") }
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "эт. ${apt.floor} · ${apt.city}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                apt.accountNumber?.let {
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "Л/С: $it",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-                apt.rejectionNote?.let {
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "Причина: $it",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-            Surface(
-                color = statusColor.copy(alpha = 0.12f),
-                shape = MaterialTheme.shapes.small
-            ) {
-                Text(
-                    text = statusText,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = statusColor,
-                    fontWeight = FontWeight.Medium
-                )
             }
         }
     }
