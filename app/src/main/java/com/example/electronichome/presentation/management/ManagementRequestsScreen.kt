@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.electronichome.domain.model.RequestCategoryUi
 import com.example.electronichome.domain.model.RequestResponse
 
@@ -91,7 +93,8 @@ fun ManagementRequestsScreen(
                     ManagementRequestCard(
                         req          = req,
                         onInProgress = { showInProgressDialog = req },
-                        onDone       = { viewModel.markDone(req.id) }
+                        onDone       = { viewModel.markDone(req.id) },
+                        onReject     = { viewModel.rejectRequest(req.id) }
                     )
                     Spacer(Modifier.height(8.dp))
                 }
@@ -121,7 +124,8 @@ fun ManagementRequestsScreen(
 private fun ManagementRequestCard(
     req: RequestResponse,
     onInProgress: () -> Unit,
-    onDone: () -> Unit
+    onDone: () -> Unit,
+    onReject: () -> Unit
 ) {
     val cat = RequestCategoryUi.entries.firstOrNull { it.key == req.category }
     val (statusColor, statusText) = when (req.status) {
@@ -194,11 +198,22 @@ private fun ManagementRequestCard(
 
             when (req.status) {
                 "PENDING" -> {
-                    Button(
-                        onClick  = onInProgress,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Взять в работу")
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(
+                            onClick  = onReject,
+                            modifier = Modifier.weight(1f),
+                            colors   = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text("Отклонить")
+                        }
+                        Button(
+                            onClick  = onInProgress,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("В работу")
+                        }
                     }
                 }
                 "IN_PROGRESS" -> {

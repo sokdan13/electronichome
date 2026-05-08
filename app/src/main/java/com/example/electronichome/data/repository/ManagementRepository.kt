@@ -89,5 +89,13 @@ class ManagementRepository @Inject constructor() {
             }.body()
         resp.data ?: throw Exception(resp.error)
     }
+
+    suspend fun rejectRequest(id: String): Result<RequestResponse> = runCatching {
+        val resp: ApiResponse<RequestResponse> = ApiClient.client
+            .patch("${ApiClient.BASE_URL}/management/requests/$id/reject") {
+                bearerAuth(token())
+            }.body()
+        resp.data ?: throw Exception(resp.error)
+    }
 }
 

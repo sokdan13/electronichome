@@ -102,6 +102,22 @@ class ManagementViewModel @Inject constructor(
                 .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
         }
     }
+    fun rejectRequest(id: String) {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true)
+            repository.rejectRequest(id)
+                .onSuccess {
+                    loadRequests()
+                    _state.value = _state.value.copy(
+                        isLoading      = false,
+                        successMessage = "Заявка отклонена"
+                    )
+                }
+                .onFailure {
+                    _state.value = _state.value.copy(isLoading = false, error = it.message)
+                }
+        }
+    }
 
     fun clearMessages() {
         _state.value = _state.value.copy(error = null, successMessage = null)
