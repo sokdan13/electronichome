@@ -6,6 +6,13 @@ import com.example.electronichome.data.repository.ManagementRepository
 import com.example.electronichome.domain.model.ApproveRequest
 import com.example.electronichome.domain.model.ApartmentResponse
 import com.example.electronichome.domain.model.RequestResponse
+import com.example.electronichome.domain.usecase.management.ApproveApartmentUseCase
+import com.example.electronichome.domain.usecase.management.GetAllRequestsUseCase
+import com.example.electronichome.domain.usecase.management.GetPendingApartmentsUseCase
+import com.example.electronichome.domain.usecase.management.MarkRequestDoneUseCase
+import com.example.electronichome.domain.usecase.management.RejectApartmentUseCase
+import com.example.electronichome.domain.usecase.management.RejectRequestUseCase
+import com.example.electronichome.domain.usecase.management.TakeRequestInProgressUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -21,7 +28,13 @@ data class ManagementUiState(
 
 @HiltViewModel
 class ManagementViewModel @Inject constructor(
-    private val repository: ManagementRepository
+    private val getPendingApartments: GetPendingApartmentsUseCase,
+    private val getAllRequests:  GetAllRequestsUseCase,
+    private val approveApartmentUS: ApproveApartmentUseCase,
+    private val rejectApartmentUS: RejectApartmentUseCase,
+    private val takeRequestInProgress: TakeRequestInProgressUseCase,
+    private val markRequestDone: MarkRequestDoneUseCase,
+    private val rejectRequestUS: RejectRequestUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ManagementUiState())
@@ -35,7 +48,7 @@ class ManagementViewModel @Inject constructor(
     fun loadApartments() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            repository.getPendingApartments()
+            getPendingApartments()
                 .onSuccess { _state.value = _state.value.copy(apartments = it, isLoading = false) }
                 .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
         }
@@ -43,7 +56,7 @@ class ManagementViewModel @Inject constructor(
 
     fun loadRequests() {
         viewModelScope.launch {
-            repository.getAllRequests()
+            getAllRequests()
                 .onSuccess { _state.value = _state.value.copy(requests = it) }
                 .onFailure { _state.value = _state.value.copy(error = it.message) }
         }
@@ -52,7 +65,7 @@ class ManagementViewModel @Inject constructor(
     fun approveApartment(id: String, req: ApproveRequest) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            repository.approveApartment(id, req)
+            approveApartmentUS(id, req)
                 .onSuccess {
                     loadApartments()
                     _state.value = _state.value.copy(successMessage = "Квартира подтверждена")
@@ -64,7 +77,7 @@ class ManagementViewModel @Inject constructor(
     fun rejectApartment(id: String, note: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            repository.rejectApartment(id, note)
+            rejectApartmentUS(id, note)
                 .onSuccess {
                     loadApartments()
                     _state.value = _state.value.copy(successMessage = "Квартира отклонена")
@@ -76,7 +89,7 @@ class ManagementViewModel @Inject constructor(
     fun takeInProgress(id: String, dueDate: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            repository.takeRequestInProgress(id, dueDate)
+            takeRequestInProgress(id, dueDate)
                 .onSuccess {
                     loadRequests()
                     _state.value = _state.value.copy(
@@ -91,7 +104,7 @@ class ManagementViewModel @Inject constructor(
     fun markDone(id: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            repository.markRequestDone(id)
+            markRequestDone(id)
                 .onSuccess {
                     loadRequests()
                     _state.value = _state.value.copy(
@@ -105,7 +118,7 @@ class ManagementViewModel @Inject constructor(
     fun rejectRequest(id: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            repository.rejectRequest(id)
+            rejectRequestUS(id)
                 .onSuccess {
                     loadRequests()
                     _state.value = _state.value.copy(

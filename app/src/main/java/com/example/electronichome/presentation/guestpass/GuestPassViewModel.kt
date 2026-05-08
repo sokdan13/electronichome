@@ -6,6 +6,9 @@ import com.example.electronichome.data.repository.GuestPassRepository
 import com.example.electronichome.domain.model.GuestPassCreateDto
 import com.example.electronichome.domain.model.GuestPassResponse
 import com.example.electronichome.domain.model.PassDuration
+import com.example.electronichome.domain.usecase.guestpass.CancelGuestPassUseCase
+import com.example.electronichome.domain.usecase.guestpass.CreateGuestPassUseCase
+import com.example.electronichome.domain.usecase.guestpass.GetMyGuestPassesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -24,7 +27,9 @@ data class GuestPassUiState(
 
 @HiltViewModel
 class GuestPassViewModel @Inject constructor(
-    private val repository: GuestPassRepository
+    private val createPass: CreateGuestPassUseCase,
+    private val getMyPasses: GetMyGuestPassesUseCase,
+    private val cancelPass: CancelGuestPassUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(GuestPassUiState())
@@ -37,7 +42,7 @@ class GuestPassViewModel @Inject constructor(
     fun loadPasses() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            repository.getMyPasses()
+            getMyPasses()
                 .onSuccess { passes ->
                     val active = passes.firstOrNull { it.isValid }
                     _state.value = _state.value.copy(
@@ -60,7 +65,7 @@ class GuestPassViewModel @Inject constructor(
     fun createPass(apartmentId: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
-            repository.createPass(
+            createPass(
                 GuestPassCreateDto(
                     apartmentId     = apartmentId,
                     durationMinutes = _state.value.selectedDuration.minutes
@@ -99,7 +104,7 @@ class GuestPassViewModel @Inject constructor(
     fun cancelPass() {
         val token = _state.value.activePass?.token ?: return
         viewModelScope.launch {
-            repository.cancelPass(token)
+            cancelPass(token)
                 .onSuccess {
                     countdownJob?.cancel()
                     _state.value = _state.value.copy(

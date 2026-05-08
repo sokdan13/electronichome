@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.electronichome.data.repository.RequestRepository
 import com.example.electronichome.domain.model.RequestCreateDto
 import com.example.electronichome.domain.model.RequestResponse
+import com.example.electronichome.domain.usecase.request.GetMyRequestsUseCase
+import com.example.electronichome.domain.usecase.request.SubmitRequestUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -19,7 +21,8 @@ data class RequestsUiState(
 
 @HiltViewModel
 class RequestsViewModel @Inject constructor(
-    private val repository: RequestRepository
+    private val getMyRequests: GetMyRequestsUseCase,
+    private val createRequest: SubmitRequestUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RequestsUiState())
@@ -30,7 +33,7 @@ class RequestsViewModel @Inject constructor(
     fun loadRequests() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
-            repository.getMyRequests()
+            getMyRequests()
                 .onSuccess { _state.value = _state.value.copy(requests = it, isLoading = false) }
                 .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
         }
@@ -39,7 +42,7 @@ class RequestsViewModel @Inject constructor(
     fun submitRequest(dto: RequestCreateDto) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
-            repository.createRequest(dto)
+            createRequest(dto)
                 .onSuccess {
                     loadRequests()
                     _state.value = _state.value.copy(isLoading = false, isSubmitSuccess = true)

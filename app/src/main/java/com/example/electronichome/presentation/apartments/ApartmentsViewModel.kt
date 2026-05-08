@@ -3,9 +3,10 @@ package com.example.electronichome.presentation.apartments
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.electronichome.data.local.ApartmentPrefs
-import com.example.electronichome.data.repository.ApartmentRepository
 import com.example.electronichome.domain.model.ApartmentRequest
 import com.example.electronichome.domain.model.ApartmentResponse
+import com.example.electronichome.domain.usecase.apartment.AddApartmentUseCase
+import com.example.electronichome.domain.usecase.apartment.GetMyApartmentsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +23,8 @@ data class ApartmentsUiState(
 
 @HiltViewModel
 class ApartmentsViewModel @Inject constructor(
-    private val repository: ApartmentRepository,
+    private val getMyApartments: GetMyApartmentsUseCase,
+    private val addApartmentUseCase: AddApartmentUseCase,
     private val prefs: ApartmentPrefs
 ) : ViewModel() {
 
@@ -37,7 +39,7 @@ class ApartmentsViewModel @Inject constructor(
     fun loadApartments() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            repository.getMyApartments()
+            getMyApartments()
                 .onSuccess { list ->
                     if (_primaryId.value == null) {
                         list.firstOrNull { it.status == "APPROVED" }?.let {
@@ -64,7 +66,7 @@ class ApartmentsViewModel @Inject constructor(
     fun addApartment(request: ApartmentRequest) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
-            repository.addApartment(request)
+            addApartmentUseCase(request)
                 .onSuccess {
                     _state.value = _state.value.copy(isLoading = false, isAddSuccess = true)
                     loadApartments()

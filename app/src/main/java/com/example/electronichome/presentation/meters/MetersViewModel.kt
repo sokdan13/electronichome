@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.electronichome.data.repository.MeterRepository
 import com.example.electronichome.domain.model.MeterReadingRequest
 import com.example.electronichome.domain.model.MeterReadingResponse
+import com.example.electronichome.domain.usecase.meter.GetMeterReadingsUseCase
+import com.example.electronichome.domain.usecase.meter.SubmitMeterReadingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,7 +33,8 @@ data class MetersUiState @RequiresApi(Build.VERSION_CODES.O) constructor(
 
 @HiltViewModel
 class MetersViewModel @Inject constructor(
-    private val repo: MeterRepository
+    private val getReadings: GetMeterReadingsUseCase,
+    private val submitReading: SubmitMeterReadingUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MetersUiState())
@@ -39,7 +42,7 @@ class MetersViewModel @Inject constructor(
 
     fun loadReadings(apartmentId: String) {
         viewModelScope.launch {
-            repo.getReadings(apartmentId)
+            getReadings(apartmentId)
                 .onSuccess { _state.value = _state.value.copy(readings = it) }
         }
     }
@@ -91,7 +94,7 @@ class MetersViewModel @Inject constructor(
                 elecNight   = _state.value.elecNight.toDoubleOrNull(),
                 elecPeak    = _state.value.elecPeak.toDoubleOrNull()
             )
-            repo.submitReading(req)
+            submitReading(req)
                 .onSuccess {
                     loadReadings(apartmentId)
                     _state.value = _state.value.copy(isLoading = false, isSubmitSuccess = true)
