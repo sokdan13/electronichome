@@ -96,6 +96,23 @@ class GuestPassViewModel @Inject constructor(
         }
     }
 
+    fun cancelPass() {
+        val token = _state.value.activePass?.token ?: return
+        viewModelScope.launch {
+            repository.cancelPass(token)
+                .onSuccess {
+                    countdownJob?.cancel()
+                    _state.value = _state.value.copy(
+                        activePass  = null,
+                        secondsLeft = 0
+                    )
+                }
+                .onFailure {
+                    _state.value = _state.value.copy(error = it.message)
+                }
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         countdownJob?.cancel()

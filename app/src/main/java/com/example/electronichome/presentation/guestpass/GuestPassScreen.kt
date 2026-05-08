@@ -67,7 +67,8 @@ fun GuestPassScreen(
                     ActivePassContent(
                         token      = activePass.token,
                         secondsLeft = state.secondsLeft,
-                        apartment  = apartment
+                        apartment  = apartment,
+                        onCancel    = { viewModel.cancelPass() }
                     )
                 } else {
                     CreatePassContent(
@@ -87,7 +88,8 @@ fun GuestPassScreen(
 private fun ActivePassContent(
     token: String,
     secondsLeft: Long,
-    apartment: ApartmentResponse
+    apartment: ApartmentResponse,
+    onCancel: () -> Unit
 ) {
     val qrBitmap = remember(token) { generateQrBitmap(token) }
     val minutes  = secondsLeft / 60
@@ -161,6 +163,16 @@ private fun ActivePassContent(
             color     = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
+        Spacer(Modifier.height(8.dp))
+        OutlinedButton(
+            onClick  = onCancel,
+            colors   = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.error
+            ),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Отменить пропуск")
+        }
     }
 }
 
@@ -170,7 +182,7 @@ private fun CreatePassContent(
     isLoading: Boolean,
     error: String?,
     onSelectDuration: (PassDuration) -> Unit,
-    onCreatePass: () -> Unit
+    onCreatePass: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

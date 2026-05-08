@@ -37,4 +37,11 @@ class GuestPassRepository @Inject constructor() {
             }.body()
         resp.data ?: emptyList()
     }
+
+    suspend fun cancelPass(token: String): Result<Unit> = runCatching {
+        ApiClient.client
+            .delete("${ApiClient.BASE_URL}/guest-passes/$token") {
+                bearerAuth(token())
+            }
+    }
 }
