@@ -22,24 +22,37 @@ class AnnouncementsViewModel @Inject constructor(
     private val getAnnouncements: GetAnnouncementsUseCase,
 ) : ViewModel() {
 
+    private var allAnnouncements: List<AnnouncementResponse> = emptyList()
     private val _state = MutableStateFlow(AnnouncementsUiState())
     val state: StateFlow<AnnouncementsUiState> = _state.asStateFlow()
 
     init { load() }
 
     fun selectCategory(cat: AnnouncementCategoryUi) {
-        _state.value = _state.value.copy(selectedCategory = cat)
-        load()
+        _state.value = _state.value.copy(
+            selectedCategory = cat,
+            announcements    = applyFilter(cat)
+        )
     }
 
     fun load() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
-            val categoryKey = _state.value.selectedCategory
-                .takeIf { it != AnnouncementCategoryUi.ALL }?.key
-            getAnnouncements(categoryKey)
-                .onSuccess { _state.value = _state.value.copy(announcements = it, isLoading = false) }
-                .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
+            getAnnouncements(null)
+                .onSuccess { list ->
+                    allAnnouncements = list
+                    _state.value = _state.value.copy(
+                        isLoading     = false,
+                        announcements = applyFilter(_state.value.selectedCategory)
+                    )
+                }
+                .onFailure {
+                    _state.value = _state.value.copy(isLoading = false, error = it.message)
+                }
         }
     }
+
+    private fun applyFilter(category: AnnouncementCategoryUi): List<AnnouncementResponse> =
+        if (category == AnnouncementCategoryUi.ALL) allAnnouncements
+        else allAnnouncements.filter { it.category == category.key }
 }

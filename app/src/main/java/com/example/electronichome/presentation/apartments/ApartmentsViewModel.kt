@@ -34,22 +34,43 @@ class ApartmentsViewModel @Inject constructor(
     private val _primaryId = MutableStateFlow(prefs.primaryApartmentId)
     val primaryId: StateFlow<String?> = _primaryId.asStateFlow()
 
+    private val _primaryApartment = MutableStateFlow<ApartmentResponse?>(null)
+    val primaryApartment = _primaryApartment.asStateFlow()
+
     init { loadApartments() }
 
     fun loadApartments() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
+
             getMyApartments()
                 .onSuccess { list ->
-                    if (_primaryId.value == null) {
-                        list.firstOrNull { it.status == "APPROVED" }?.let {
-                            setPrimary(it.id)
+
+                    var currentPrimaryId = _primaryId.value
+
+                    if (currentPrimaryId == null) {
+                        currentPrimaryId =
+                            list.firstOrNull { it.status == "APPROVED" }?.id
+
+                        currentPrimaryId?.let {
+                            prefs.primaryApartmentId = it
+                            _primaryId.value = it
                         }
                     }
-                    _state.value = _state.value.copy(apartments = list, isLoading = false)
+
+                    _primaryApartment.value =
+                        list.firstOrNull { it.id == currentPrimaryId }
+
+                    _state.value = _state.value.copy(
+                        apartments = list,
+                        isLoading = false
+                    )
                 }
                 .onFailure { e ->
-                    _state.value = _state.value.copy(isLoading = false, error = e.message)
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
                 }
         }
     }
@@ -57,6 +78,9 @@ class ApartmentsViewModel @Inject constructor(
     fun setPrimary(id: String) {
         prefs.primaryApartmentId = id
         _primaryId.value = id
+
+        _primaryApartment.value =
+            _state.value.apartments.firstOrNull { it.id == id }
     }
 
     fun getPrimaryApartment() = state.value.apartments.firstOrNull {

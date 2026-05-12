@@ -29,10 +29,9 @@ fun HomeScreen(
     navController: NavController,
     viewModel: ApartmentsViewModel = hiltViewModel()
 ) {
-    val state     by viewModel.state.collectAsState()
-    val primaryId by viewModel.primaryId.collectAsState()
 
-    val primaryApt = state.apartments.firstOrNull { it.id == primaryId }
+    val state by viewModel.state.collectAsState()
+    val primaryApt by viewModel.primaryApartment.collectAsState()
     val context = LocalContext.current
     val dispatcherPhoneNumber = "+71234567890"
 
@@ -47,7 +46,7 @@ fun HomeScreen(
                 if (primaryApt != null) {
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
-                            text       = primaryApt.apartment,
+                            text       = primaryApt!!.apartment,
                             fontSize   = 90.sp,
                             fontWeight = FontWeight.Bold,
                             color      = Color.White,
@@ -63,15 +62,15 @@ fun HomeScreen(
                     }
                     Text(
                         text = buildString {
-                            append("г. ${primaryApt.city}, ${primaryApt.street}, ")
-                            append("д. ${primaryApt.house}")
-                            primaryApt.building?.let { append(", корп. $it") }
-                            append(", эт. ${primaryApt.floor}")
+                            append("г. ${primaryApt!!.city}, ${primaryApt!!.street}, ")
+                            append("д. ${primaryApt!!.house}")
+                            primaryApt!!.building?.let { append(", корп. $it") }
+                            append(", эт. ${primaryApt!!.floor}")
                         },
                         fontSize = 13.sp,
                         color    = Color.White.copy(alpha = 0.8f)
                     )
-                    primaryApt.accountNumber?.let {
+                    primaryApt!!.accountNumber?.let {
                         Spacer(Modifier.height(3.dp))
                         Text(
                             text     = "Л/С: $it",
