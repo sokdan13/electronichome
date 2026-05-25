@@ -2,6 +2,7 @@ package com.example.electronichome.di
 
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.*
 
 import io.ktor.serialization.kotlinx.json.*
@@ -16,6 +17,12 @@ object ApiClient {
                 ignoreUnknownKeys = true
                 isLenient = true
             })
+        }
+        install(HttpTimeout) {
+
+            connectTimeoutMillis = 1000
+            requestTimeoutMillis = 1000
+            socketTimeoutMillis = 1000
         }
     }
 }
