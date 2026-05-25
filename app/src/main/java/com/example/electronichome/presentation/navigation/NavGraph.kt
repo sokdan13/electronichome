@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -13,6 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
@@ -34,23 +40,24 @@ import com.example.electronichome.presentation.requests.RequestsScreen
 import com.example.electronichome.presentation.screens.ProfileScreen
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
+import com.example.electronichome.R
 
 data class BottomNavItem(
     val route: String,
     val label: String,
-    val icon: ImageVector
+    val icon: Int
 )
 
 val residentBottomNav = listOf(
-    BottomNavItem(Screen.Announcements.route, "Объявления", Icons.Outlined.Notifications),
-    BottomNavItem(Screen.Home.route,          "Главная",    Icons.Outlined.Home),
-    BottomNavItem(Screen.Profile.route,       "Профиль",    Icons.Outlined.Person)
+    BottomNavItem(Screen.Announcements.route, "Объявления", R.drawable.ic_announcements),
+    BottomNavItem(Screen.Home.route,          "Главная",    R.drawable.ic_apartments_b),
+    BottomNavItem(Screen.Profile.route,       "Профиль",   R.drawable.ic_account)
 )
 
 val managementBottomNav = listOf(
-    BottomNavItem(Screen.ManagementRequests.route,   "Заявки",   Icons.Outlined.Home),
-    BottomNavItem(Screen.ManagementHome.route,       "Главная",  Icons.Outlined.Home),
-    BottomNavItem(Screen.ManagementApartments.route, "Квартиры", Icons.Outlined.Home)
+    BottomNavItem(Screen.ManagementRequests.route,   "Заявки",   R.drawable.ic_announcements),
+    BottomNavItem(Screen.ManagementHome.route,       "Главная",  R.drawable.ic_announcements),
+    BottomNavItem(Screen.ManagementApartments.route, "Квартиры", R.drawable.ic_announcements)
 )
 
 private val bottomBarRoutes = (residentBottomNav + managementBottomNav).map { it.route }.toSet()
@@ -95,22 +102,62 @@ fun AppNavGraph(navController: NavHostController) {
         contentWindowInsets = WindowInsets(0),
         bottomBar = {
             currentBottomNav?.let { items ->
-                NavigationBar(
-                    containerColor = Color(0x00FFFFFF),
-                ){
-                    items.forEach { item ->
-                        NavigationBarItem(
-                            selected = currentRoute == item.route,
-                            onClick  = {
-                                navController.navigate(item.route) {
-                                    popUpTo(items.first().route) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState    = true
-                                }
-                            },
-                            icon  = { Icon(item.icon, contentDescription = item.label) },
-                            label = { Text(item.label) }
-                        )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+
+                    Surface(
+                        shape = RoundedCornerShape(28.dp),
+                        shadowElevation = 10.dp,
+                        color = MaterialTheme.colorScheme.surface
+                    ) {
+
+                        NavigationBar(
+                            containerColor = Color.Transparent,
+                            tonalElevation = 0.dp
+                        ) {
+
+                            items.forEach { item ->
+
+                                NavigationBarItem(
+                                    selected = currentRoute == item.route,
+
+                                    onClick = {
+                                        navController.navigate(item.route) {
+                                            popUpTo(items.first().route) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    },
+
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(id = item.icon),
+                                            contentDescription = item.label,
+                                            modifier = Modifier.size(24.dp),
+                                            tint = Color.Unspecified
+                                        )
+                                    },
+
+                                    label = {
+                                        Text(
+                                            text = item.label,
+                                            fontSize = 11.sp
+                                        )
+                                    },
+
+                                    colors = NavigationBarItemDefaults.colors(
+                                        indicatorColor =
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }

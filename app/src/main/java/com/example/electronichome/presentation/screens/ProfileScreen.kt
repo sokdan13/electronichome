@@ -8,7 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import com.example.electronichome.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,14 +72,14 @@ fun ProfileScreen(
 
         Column(modifier = Modifier.padding(vertical = 8.dp)) {
             ProfileMenuItem(
-                icon    = Icons.Outlined.Home,
+                icon    = R.drawable.ic_apartments,
                 title   = "Мои квартиры",
                 subtitle = "Управление квартирами и статусы",
                 onClick = onNavigateToApartments
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
             ProfileMenuItem(
-                icon     = Icons.Outlined.Home,
+                icon     = R.drawable.ic_requests_ps,
                 title    = "Мои заявки",
                 subtitle = "История обращений",
                 onClick  = onNavigateToRequests
@@ -111,7 +112,7 @@ fun ProfileScreen(
 
 @Composable
 private fun ProfileMenuItem(
-    icon: ImageVector,
+    icon: Int,
     title: String,
     subtitle: String,
     onClick: () -> Unit
@@ -127,7 +128,7 @@ private fun ProfileMenuItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector        = icon,
+                painter = painterResource(id = icon),
                 contentDescription = null,
                 tint               = MaterialTheme.colorScheme.primary,
                 modifier           = Modifier.size(24.dp)
@@ -145,11 +146,6 @@ private fun ProfileMenuItem(
                     color    = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Icon(
-                imageVector        = Icons.Outlined.Home,
-                contentDescription = null,
-                tint               = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }

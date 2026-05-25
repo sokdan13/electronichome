@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +31,7 @@ import com.example.electronichome.domain.model.ApartmentResponse
 import com.example.electronichome.domain.model.RequestCategoryUi
 import com.example.electronichome.domain.model.RequestCreateDto
 import com.example.electronichome.domain.model.RequestResponse
+import com.example.electronichome.R
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -268,10 +270,10 @@ private fun RequestForm(
 @Composable
 private fun RequestCard(req: RequestResponse) {
     val (statusColor, statusIcon) = when (req.status) {
-        "PENDING"     -> MaterialTheme.colorScheme.secondary to Icons.Outlined.Home
-        "IN_PROGRESS" -> Color(0xFF1E88E5) to Icons.Outlined.Build
-        "DONE"        -> Color(0xFF43A047) to Icons.Outlined.CheckCircle
-        else          -> MaterialTheme.colorScheme.onSurfaceVariant to Icons.Outlined.Info
+        "REJECTED"     ->Color(0xFFE52F1E) to R.drawable.ic_reject
+        "PENDING" -> Color(0xFF1E88E5) to R.drawable.ic_in_progress
+        "DONE"        -> Color(0xFF43A047)to R.drawable.ic_done
+        else          -> MaterialTheme.colorScheme.onSurfaceVariant to R.drawable.ic_reject
     }
 
     val cat = RequestCategoryUi.entries.firstOrNull { it.key == req.category }
@@ -311,7 +313,7 @@ private fun RequestCard(req: RequestResponse) {
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Icon(
-                            imageVector        = statusIcon,
+                            painter = painterResource(id = statusIcon),
                             contentDescription = null,
                             tint               = statusColor,
                             modifier           = Modifier.size(12.dp)

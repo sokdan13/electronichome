@@ -53,7 +53,7 @@ fun AnnouncementsScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(top = padding.calculateTopPadding())
                 .pullRefresh(pullRefreshState)
         ) {
             LazyColumn(
