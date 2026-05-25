@@ -18,7 +18,8 @@ data class ApartmentsUiState(
     val apartments: List<ApartmentResponse> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val isAddSuccess: Boolean = false
+    val isAddSuccess: Boolean = false,
+    val isConnectionError: Boolean = false
 )
 
 @HiltViewModel
@@ -67,9 +68,14 @@ class ApartmentsViewModel @Inject constructor(
                     )
                 }
                 .onFailure { e ->
+
+                    val isConnectionProblem =
+                        e is java.io.IOException
+
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = e.message
+                        error = e.message,
+                        isConnectionError = isConnectionProblem
                     )
                 }
         }

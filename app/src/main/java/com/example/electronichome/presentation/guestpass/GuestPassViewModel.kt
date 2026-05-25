@@ -22,7 +22,9 @@ data class GuestPassUiState(
     val isLoading: Boolean              = false,
     val error: String?                  = null,
     val selectedDuration: PassDuration  = PassDuration.THIRTY,
-    val secondsLeft: Long               = 0
+    val secondsLeft: Long               = 0,
+    val isConnectionError: Boolean = false
+
 )
 
 @HiltViewModel
@@ -52,8 +54,16 @@ class GuestPassViewModel @Inject constructor(
                     )
                     active?.let { startCountdown(it.minutesLeft * 60) }
                 }
-                .onFailure {
-                    _state.value = _state.value.copy(isLoading = false, error = it.message)
+                .onFailure { e ->
+
+                    val isConnectionProblem =
+                        e is java.io.IOException
+
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = e.message,
+                        isConnectionError = isConnectionProblem
+                    )
                 }
         }
     }

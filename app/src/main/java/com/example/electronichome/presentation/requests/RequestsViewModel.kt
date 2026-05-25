@@ -16,7 +16,8 @@ data class RequestsUiState(
     val requests: List<RequestResponse> = emptyList(),
     val isLoading: Boolean = false,
     val isSubmitSuccess: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isConnectionError: Boolean = false
 )
 
 @HiltViewModel
@@ -35,7 +36,17 @@ class RequestsViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true, error = null)
             getMyRequests()
                 .onSuccess { _state.value = _state.value.copy(requests = it, isLoading = false) }
-                .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
+                .onFailure { e ->
+
+                    val isConnectionProblem =
+                        e is java.io.IOException
+
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = e.message,
+                        isConnectionError = isConnectionProblem
+                    )
+                }
         }
     }
 

@@ -14,7 +14,8 @@ data class AnnouncementsUiState(
     val announcements: List<AnnouncementResponse> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val selectedCategory: AnnouncementCategoryUi = AnnouncementCategoryUi.ALL
+    val selectedCategory: AnnouncementCategoryUi = AnnouncementCategoryUi.ALL,
+    val isConnectionError: Boolean = false
 )
 
 @HiltViewModel
@@ -46,8 +47,16 @@ class AnnouncementsViewModel @Inject constructor(
                         announcements = applyFilter(_state.value.selectedCategory)
                     )
                 }
-                .onFailure {
-                    _state.value = _state.value.copy(isLoading = false, error = it.message)
+                .onFailure { e ->
+
+                    val isConnectionProblem =
+                        e is java.io.IOException
+
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = e.message,
+                        isConnectionError = isConnectionProblem
+                    )
                 }
         }
     }

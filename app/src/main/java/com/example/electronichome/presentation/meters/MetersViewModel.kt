@@ -28,7 +28,8 @@ data class MetersUiState @RequiresApi(Build.VERSION_CODES.O) constructor(
     val elecDay: String = "",
     val elecNight: String = "",
     val elecPeak: String = "",
-    val showArchive: Boolean = false
+    val showArchive: Boolean = false,
+    val isConnectionError: Boolean = false
 )
 
 @HiltViewModel
@@ -44,6 +45,17 @@ class MetersViewModel @Inject constructor(
         viewModelScope.launch {
             getReadings(apartmentId)
                 .onSuccess { _state.value = _state.value.copy(readings = it) }
+                .onFailure { e ->
+
+                    val isConnectionProblem =
+                        e is java.io.IOException
+
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = e.message,
+                        isConnectionError = isConnectionProblem
+                    )
+                }
         }
     }
 
