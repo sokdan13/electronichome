@@ -32,6 +32,7 @@ import com.example.electronichome.domain.model.RequestCategoryUi
 import com.example.electronichome.domain.model.RequestCreateDto
 import com.example.electronichome.domain.model.RequestResponse
 import com.example.electronichome.R
+import com.example.electronichome.presentation.screens.NoConnectionPlaceholder
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -81,52 +82,64 @@ fun RequestsScreen(
             )
         }
     ) { padding ->
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .pullRefresh(pullRefreshState)
         ) {
+            when {
 
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                item {
-                    AnimatedVisibility(visible = showForm) {
-                        RequestForm(
-                            apartment  = apartment,
-                            isLoading  = state.isLoading,
-                            error      = state.error,
-                            onSubmit   = { dto -> viewModel.submitRequest(dto) },
-                            onDismiss  = { showForm = false }
-                        )
-                    }
+                state.isConnectionError -> {
+                    NoConnectionPlaceholder(
+                        onRetry = { viewModel.loadRequests() }
+                    )
                 }
 
-                if (state.requests.isEmpty() && !showForm) {
-                    item {
-                        Box(
-                            modifier          = Modifier.fillParentMaxSize(),
-                            contentAlignment  = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text  = "Заявок пока нет",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                else -> {
+
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        item {
+                            AnimatedVisibility(visible = showForm) {
+                                RequestForm(
+                                    apartment = apartment,
+                                    isLoading = state.isLoading,
+                                    error = state.error,
+                                    onSubmit = { dto -> viewModel.submitRequest(dto) },
+                                    onDismiss = { showForm = false }
                                 )
-                                Spacer(Modifier.height(8.dp))
-                                TextButton(onClick = { showForm = true }) {
-                                    Text("Создать заявку")
+                            }
+                        }
+
+                        if (state.requests.isEmpty() && !showForm) {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillParentMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text(
+                                            text = "Заявок пока нет",
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Spacer(Modifier.height(8.dp))
+                                        TextButton(onClick = { showForm = true }) {
+                                            Text("Создать заявку")
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                }
 
-                items(state.requests) { req ->
-                    RequestCard(req)
+                        items(state.requests) { req ->
+                            RequestCard(req)
+                        }
+                    }
                 }
             }
 

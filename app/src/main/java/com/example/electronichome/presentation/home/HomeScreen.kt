@@ -95,7 +95,7 @@ fun HomeScreen(
                 }
             }
         }
-
+        val isApartmentAvailable = primaryApt != null
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text     = "Быстрые действия",
@@ -108,12 +108,14 @@ fun HomeScreen(
                     title = "Передать показания",
                     icon = R.drawable.ic_meters,
                     modifier = Modifier.weight(1f),
+                    enabled = isApartmentAvailable,
                     onClick = { navController.navigate(Screen.Meters.route) }
                 )
                 QuickActionCard(
                     title = "Мои заявки",
                     icon = R.drawable.ic_requests,
                     modifier = Modifier.weight(1f),
+                    enabled = isApartmentAvailable,
                     onClick = { navController.navigate(Screen.Requests.route) }
                 )
             }
@@ -123,6 +125,7 @@ fun HomeScreen(
                     title   = "Выдача гостевого пропуска",
                     icon    = R.drawable.ic_qr,
                     modifier = Modifier.weight(1f),
+                    enabled = isApartmentAvailable,
                     onClick = { navController.navigate(Screen.GuestPass.route) }
                 )
                 QuickActionCard(
@@ -176,10 +179,14 @@ fun QuickActionCard(
     title: String,
     icon: Int,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Card(
-        onClick   = onClick,
+        onClick = {
+            if (enabled) onClick()
+        },
+        enabled = enabled,
         modifier  = modifier.aspectRatio(1f),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(

@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.electronichome.domain.model.AnnouncementCategoryUi
 import com.example.electronichome.domain.model.AnnouncementResponse
+import com.example.electronichome.presentation.screens.NoConnectionPlaceholder
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -56,38 +57,49 @@ fun AnnouncementsScreen(
                 .padding(top = padding.calculateTopPadding())
                 .pullRefresh(pullRefreshState)
         ) {
-            LazyColumn(
-                modifier       = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
-                item {
-                    CategoryFilter(
-                        selected = state.selectedCategory,
-                        onSelect = viewModel::selectCategory
+            when {
+
+                state.isConnectionError -> {
+                    NoConnectionPlaceholder(
+                        onRetry = { viewModel.load() }
                     )
                 }
 
-                if (state.announcements.isEmpty() && !state.isLoading) {
-                    item {
-                        Box(
-                            modifier         = Modifier
-                                .fillParentMaxWidth()
-                                .padding(top = 80.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text  = "Объявлений нет",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 16.dp)
+                    ) {
+                        item {
+                            CategoryFilter(
+                                selected = state.selectedCategory,
+                                onSelect = viewModel::selectCategory
+                            )
+                        }
+
+                        if (state.announcements.isEmpty() && !state.isLoading) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillParentMaxWidth()
+                                        .padding(top = 80.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "Объявлений нет",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+
+                        items(state.announcements) { item ->
+                            AnnouncementCard(
+                                item = item,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                             )
                         }
                     }
-                }
-
-                items(state.announcements) { item ->
-                    AnnouncementCard(
-                        item     = item,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                    )
                 }
             }
 

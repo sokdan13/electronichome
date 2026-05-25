@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.electronichome.domain.model.ApartmentResponse
 import com.example.electronichome.domain.model.PassDuration
+import com.example.electronichome.presentation.screens.NoConnectionPlaceholder
 import com.example.electronichome.utils.generateQrBitmap
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,34 +51,45 @@ fun GuestPassScreen(
             )
         }
     ) { padding ->
-        Column(
-            modifier            = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            AnimatedContent(
-                targetState = state.activePass,
-                transitionSpec = {
-                    fadeIn() togetherWith fadeOut()
-                }
-            ) { activePass ->
-                if (activePass != null) {
-                    ActivePassContent(
-                        token      = activePass.token,
-                        secondsLeft = state.secondsLeft,
-                        apartment  = apartment,
-                        onCancel    = { viewModel.cancelPass() }
-                    )
-                } else {
-                    CreatePassContent(
-                        selectedDuration = state.selectedDuration,
-                        isLoading        = state.isLoading,
-                        error            = state.error,
-                        onSelectDuration = viewModel::selectDuration,
-                        onCreatePass     = { viewModel.createPass(apartment.id) }
-                    )
+        when {
+
+            state.isConnectionError -> {
+                NoConnectionPlaceholder(
+                    onRetry = { viewModel.loadPasses() }
+                )
+            }
+
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    AnimatedContent(
+                        targetState = state.activePass,
+                        transitionSpec = {
+                            fadeIn() togetherWith fadeOut()
+                        }
+                    ) { activePass ->
+                        if (activePass != null) {
+                            ActivePassContent(
+                                token = activePass.token,
+                                secondsLeft = state.secondsLeft,
+                                apartment = apartment,
+                                onCancel = { viewModel.cancelPass() }
+                            )
+                        } else {
+                            CreatePassContent(
+                                selectedDuration = state.selectedDuration,
+                                isLoading = state.isLoading,
+                                error = state.error,
+                                onSelectDuration = viewModel::selectDuration,
+                                onCreatePass = { viewModel.createPass(apartment.id) }
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -50,7 +50,8 @@ class GuestPassViewModel @Inject constructor(
                     _state.value = _state.value.copy(
                         passes     = passes,
                         activePass = active,
-                        isLoading  = false
+                        isLoading  = false,
+                        isConnectionError = false
                     )
                     active?.let { startCountdown(it.minutesLeft * 60) }
                 }

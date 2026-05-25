@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.electronichome.domain.model.ApartmentResponse
 import com.example.electronichome.domain.model.MeterReadingResponse
+import com.example.electronichome.presentation.screens.NoConnectionPlaceholder
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
@@ -67,128 +68,139 @@ fun MetersScreen(
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-        ) {
-            ApartmentHeader(apartment)
-            Spacer(Modifier.height(16.dp))
-            MonthYearPicker(
-                selectedMonth = state.selectedMonth,
-                selectedYear  = state.selectedYear,
-                onMonthChange = viewModel::setMonth,
-                onYearChange  = viewModel::setYear
-            )
-            Spacer(Modifier.height(20.dp))
-            MeterSection(
-                title = "Горячая вода",
-                unit  = "м³",
-                color = Color(0xFFE53935),
-                value = state.hotWater,
-                onChange = { viewModel.updateField("hotWater", it) }
-            )
-            MeterSection(
-                title = "Холодная вода",
-                unit  = "м³",
-                color = Color(0xFF1E88E5),
-                value = state.coldWater,
-                onChange = { viewModel.updateField("coldWater", it) }
-            )
-            MeterSection(
-                title = "Отопление",
-                unit  = "Гкал",
-                color = Color(0xFFF57C00),
-                value = state.heating,
-                onChange = { viewModel.updateField("heating", it) }
-            )
-            Text(
-                text     = "Электричество",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 15.sp,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-            MeterSection(
-                title = "День (Т1)",
-                unit  = "кВт·ч",
-                color = Color(0xFF8E24AA),
-                value = state.elecDay,
-                onChange = { viewModel.updateField("elecDay", it) }
-            )
-            MeterSection(
-                title = "Ночь (Т2)",
-                unit  = "кВт·ч",
-                color = Color(0xFF5E35B1),
-                value = state.elecNight,
-                onChange = { viewModel.updateField("elecNight", it) }
-            )
-            MeterSection(
-                title = "Пик (Т3)",
-                unit  = "кВт·ч",
-                color = Color(0xFF3949AB),
-                value = state.elecPeak,
-                onChange = { viewModel.updateField("elecPeak", it) }
-            )
-            Spacer(Modifier.height(8.dp))
+        when {
 
-            state.error?.let {
-                Card(
-                    colors   = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                ) {
-                    Text(
-                        text     = it,
-                        color    = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.padding(12.dp)
-                    )
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            Button(
-                onClick  = { viewModel.submit(apartment.id) },
-                enabled  = !state.isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .height(52.dp)
-            ) {
-                if (state.isLoading) {
-                    CircularProgressIndicator(
-                        modifier    = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color       = Color.White
-                    )
-                } else {
-                    Text("Передать показания", fontSize = 16.sp)
-                }
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            OutlinedButton(
-                onClick  = viewModel::toggleArchive,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                Icon(
-                    if (state.showArchive) Icons.Outlined.KeyboardArrowUp
-                    else Icons.Outlined.KeyboardArrowDown,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+            state.isConnectionError -> {
+                NoConnectionPlaceholder(
+                    onRetry = { viewModel.loadReadings(apartment.id) }
                 )
-                Spacer(Modifier.width(8.dp))
-                Text("Архивные показания")
             }
 
-            if (state.showArchive) {
-                Spacer(Modifier.height(8.dp))
-                ArchiveSection(readings = state.readings)
-            }
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    ApartmentHeader(apartment)
+                    Spacer(Modifier.height(16.dp))
+                    MonthYearPicker(
+                        selectedMonth = state.selectedMonth,
+                        selectedYear = state.selectedYear,
+                        onMonthChange = viewModel::setMonth,
+                        onYearChange = viewModel::setYear
+                    )
+                    Spacer(Modifier.height(20.dp))
+                    MeterSection(
+                        title = "Горячая вода",
+                        unit = "м³",
+                        color = Color(0xFFE53935),
+                        value = state.hotWater,
+                        onChange = { viewModel.updateField("hotWater", it) }
+                    )
+                    MeterSection(
+                        title = "Холодная вода",
+                        unit = "м³",
+                        color = Color(0xFF1E88E5),
+                        value = state.coldWater,
+                        onChange = { viewModel.updateField("coldWater", it) }
+                    )
+                    MeterSection(
+                        title = "Отопление",
+                        unit = "Гкал",
+                        color = Color(0xFFF57C00),
+                        value = state.heating,
+                        onChange = { viewModel.updateField("heating", it) }
+                    )
+                    Text(
+                        text = "Электричество",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                    MeterSection(
+                        title = "День (Т1)",
+                        unit = "кВт·ч",
+                        color = Color(0xFF8E24AA),
+                        value = state.elecDay,
+                        onChange = { viewModel.updateField("elecDay", it) }
+                    )
+                    MeterSection(
+                        title = "Ночь (Т2)",
+                        unit = "кВт·ч",
+                        color = Color(0xFF5E35B1),
+                        value = state.elecNight,
+                        onChange = { viewModel.updateField("elecNight", it) }
+                    )
+                    MeterSection(
+                        title = "Пик (Т3)",
+                        unit = "кВт·ч",
+                        color = Color(0xFF3949AB),
+                        value = state.elecPeak,
+                        onChange = { viewModel.updateField("elecPeak", it) }
+                    )
+                    Spacer(Modifier.height(8.dp))
 
-            Spacer(Modifier.height(24.dp))
+                    state.error?.let {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        ) {
+                            Text(
+                                text = it,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.padding(12.dp)
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                    }
+
+                    Button(
+                        onClick = { viewModel.submit(apartment.id) },
+                        enabled = !state.isLoading,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .height(52.dp)
+                    ) {
+                        if (state.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = Color.White
+                            )
+                        } else {
+                            Text("Передать показания", fontSize = 16.sp)
+                        }
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    OutlinedButton(
+                        onClick = viewModel::toggleArchive,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Icon(
+                            if (state.showArchive) Icons.Outlined.KeyboardArrowUp
+                            else Icons.Outlined.KeyboardArrowDown,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text("Архивные показания")
+                    }
+
+                    if (state.showArchive) {
+                        Spacer(Modifier.height(8.dp))
+                        ArchiveSection(readings = state.readings)
+                    }
+
+                    Spacer(Modifier.height(24.dp))
+                }
+            }
         }
     }
 }

@@ -44,7 +44,8 @@ class AnnouncementsViewModel @Inject constructor(
                     allAnnouncements = list
                     _state.value = _state.value.copy(
                         isLoading     = false,
-                        announcements = applyFilter(_state.value.selectedCategory)
+                        announcements = applyFilter(_state.value.selectedCategory),
+                        isConnectionError = false
                     )
                 }
                 .onFailure { e ->

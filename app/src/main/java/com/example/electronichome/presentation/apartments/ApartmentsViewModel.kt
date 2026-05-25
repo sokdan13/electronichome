@@ -64,8 +64,10 @@ class ApartmentsViewModel @Inject constructor(
 
                     _state.value = _state.value.copy(
                         apartments = list,
-                        isLoading = false
+                        isLoading = false,
+                        isConnectionError = false
                     )
+
                 }
                 .onFailure { e ->
 

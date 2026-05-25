@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.electronichome.domain.model.ApartmentResponse
+import com.example.electronichome.presentation.screens.NoConnectionPlaceholder
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -30,11 +31,11 @@ fun ApartmentsScreen(
     onNavigateBack: () -> Unit,
     viewModel: ApartmentsViewModel = hiltViewModel()
 ) {
-    val state     by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
     val primaryId by viewModel.primaryId.collectAsState()
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isLoading,
-        onRefresh  = { viewModel.loadApartments() }
+        onRefresh = { viewModel.loadApartments() }
     )
 
     Scaffold(
@@ -47,49 +48,65 @@ fun ApartmentsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick        = onAddApartment,
+                onClick = onAddApartment,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(Icons.Outlined.Add, null, tint = Color.White)
             }
         }
     ) { padding ->
+
         Box(
             modifier = Modifier
                 .padding(padding)
                 .pullRefresh(pullRefreshState)
         ) {
-            LazyColumn(modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(state.apartments) { apt ->
-                    ApartmentCard(
-                        apt       = apt,
-                        isPrimary = apt.id == primaryId,
-                        onSetPrimary = {
-                            if (apt.status == "APPROVED") viewModel.setPrimary(apt.id)
-                        }
+
+            when {
+
+                state.isConnectionError -> {
+                    NoConnectionPlaceholder(
+                        onRetry = { viewModel.loadApartments() }
                     )
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(state.apartments) { apt ->
+                            ApartmentCard(
+                                apt = apt,
+                                isPrimary = apt.id == primaryId,
+                                onSetPrimary = {
+                                    if (apt.status == "APPROVED") {
+                                        viewModel.setPrimary(apt.id)
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             }
 
             PullRefreshIndicator(
                 refreshing = state.isLoading,
-                state      = pullRefreshState,
-                modifier   = Modifier.align(Alignment.TopCenter),
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter),
                 contentColor = MaterialTheme.colorScheme.primary
             )
         }
     }
 }
-
 @Composable
 fun ApartmentCard(
     apt: ApartmentResponse,
