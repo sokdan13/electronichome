@@ -132,6 +132,7 @@ private fun ManagementRequestCard(
         "PENDING"     -> MaterialTheme.colorScheme.secondary to "В обработке"
         "IN_PROGRESS" -> Color(0xFF1E88E5) to "В работе"
         "DONE"        -> Color(0xFF43A047) to "Выполнена"
+        "REJECTED"        -> Color(0xFFA04343) to "Отклонена"
         else          -> MaterialTheme.colorScheme.onSurfaceVariant to req.status
     }
 
