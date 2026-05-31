@@ -224,6 +224,7 @@ fun AppNavGraph(navController: NavHostController) {
                     onNavigateToApartments = { navController.navigate(Screen.Apartments.route) },
                     onLogout = {
                         FirebaseAuth.getInstance().signOut()
+                        authViewModel.logout()
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }
@@ -304,8 +305,12 @@ fun AppNavGraph(navController: NavHostController) {
                     navController = navController,
                     onLogout = {
                         FirebaseAuth.getInstance().signOut()
+                        authViewModel.logout()
                         navController.navigate(Screen.Login.route) {
-                            popUpTo(navController.graph.id) { inclusive = true }
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
                         }
                     }
                 )

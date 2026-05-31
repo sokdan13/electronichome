@@ -71,7 +71,8 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun clearError() {
-        _state.value = _state.value.copy(error = null)
+    fun logout() {
+        auth.signOut()
+        _state.value = AuthState()
     }
 }
