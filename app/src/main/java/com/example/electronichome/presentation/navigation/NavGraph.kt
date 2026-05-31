@@ -55,9 +55,9 @@ val residentBottomNav = listOf(
 )
 
 val managementBottomNav = listOf(
-    BottomNavItem(Screen.ManagementRequests.route,   "Заявки",   R.drawable.ic_announcements),
-    BottomNavItem(Screen.ManagementHome.route,       "Главная",  R.drawable.ic_announcements),
-    BottomNavItem(Screen.ManagementApartments.route, "Квартиры", R.drawable.ic_announcements)
+    BottomNavItem(Screen.ManagementRequests.route,   "Заявки",   R.drawable.ic_requests_ps),
+    BottomNavItem(Screen.ManagementHome.route,       "Главная",  R.drawable.ic_apartments_b),
+    BottomNavItem(Screen.ManagementApartments.route, "Квартиры", R.drawable.ic_apartments)
 )
 
 private val bottomBarRoutes = (residentBottomNav + managementBottomNav).map { it.route }.toSet()
@@ -127,7 +127,7 @@ fun AppNavGraph(navController: NavHostController) {
 
                                     onClick = {
                                         navController.navigate(item.route) {
-                                            popUpTo(items.first().route) {
+                                            popUpTo(navController.graph.startDestinationId) {
                                                 saveState = true
                                             }
                                             launchSingleTop = true
