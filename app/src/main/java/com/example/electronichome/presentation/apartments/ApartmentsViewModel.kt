@@ -38,20 +38,20 @@ class ApartmentsViewModel @Inject constructor(
     private val _primaryApartment = MutableStateFlow<ApartmentResponse?>(null)
     val primaryApartment = _primaryApartment.asStateFlow()
 
-    init { loadApartments() }
+    init {
+        loadApartments()
+    }
 
     fun loadApartments() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
 
-            getMyApartments()
-                .onSuccess { list ->
+            getMyApartments().onSuccess { list ->
 
                     var currentPrimaryId = _primaryId.value
 
                     if (currentPrimaryId == null) {
-                        currentPrimaryId =
-                            list.firstOrNull { it.status == "APPROVED" }?.id
+                        currentPrimaryId = list.firstOrNull { it.status == "APPROVED" }?.id
 
                         currentPrimaryId?.let {
                             prefs.primaryApartmentId = it
@@ -59,20 +59,15 @@ class ApartmentsViewModel @Inject constructor(
                         }
                     }
 
-                    _primaryApartment.value =
-                        list.firstOrNull { it.id == currentPrimaryId }
+                    _primaryApartment.value = list.firstOrNull { it.id == currentPrimaryId }
 
                     _state.value = _state.value.copy(
-                        apartments = list,
-                        isLoading = false,
-                        isConnectionError = false
+                        apartments = list, isLoading = false, isConnectionError = false
                     )
 
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
 
-                    val isConnectionProblem =
-                        e is java.io.IOException
+                    val isConnectionProblem = e is java.io.IOException
 
                     _state.value = _state.value.copy(
                         isLoading = false,
@@ -87,8 +82,7 @@ class ApartmentsViewModel @Inject constructor(
         prefs.primaryApartmentId = id
         _primaryId.value = id
 
-        _primaryApartment.value =
-            _state.value.apartments.firstOrNull { it.id == id }
+        _primaryApartment.value = _state.value.apartments.firstOrNull { it.id == id }
     }
 
     fun getPrimaryApartment() = state.value.apartments.firstOrNull {
@@ -98,12 +92,10 @@ class ApartmentsViewModel @Inject constructor(
     fun addApartment(request: ApartmentRequest) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
-            addApartmentUseCase(request)
-                .onSuccess {
+            addApartmentUseCase(request).onSuccess {
                     _state.value = _state.value.copy(isLoading = false, isAddSuccess = true)
                     loadApartments()
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
                     _state.value = _state.value.copy(isLoading = false, error = e.message)
                 }
         }

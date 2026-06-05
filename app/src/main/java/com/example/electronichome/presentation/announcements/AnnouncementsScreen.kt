@@ -35,22 +35,20 @@ fun AnnouncementsScreen(
     val state by viewModel.state.collectAsState()
 
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = state.isLoading,
-        onRefresh  = viewModel::load
+        refreshing = state.isLoading, onRefresh = viewModel::load
     )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title        = { Text("Объявления") },
+                title = { Text("Объявления") },
                 windowInsets = WindowInsets.statusBars,
-                colors       = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 )
             )
-        }
-    ) { padding ->
+        }) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -61,8 +59,7 @@ fun AnnouncementsScreen(
 
                 state.isConnectionError -> {
                     NoConnectionPlaceholder(
-                        onRetry = { viewModel.load() }
-                    )
+                        onRetry = { viewModel.load() })
                 }
 
                 else -> {
@@ -104,9 +101,9 @@ fun AnnouncementsScreen(
             }
 
             PullRefreshIndicator(
-                refreshing   = state.isLoading,
-                state        = pullRefreshState,
-                modifier     = Modifier.align(Alignment.TopCenter),
+                refreshing = state.isLoading,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter),
                 contentColor = MaterialTheme.colorScheme.primary
             )
         }
@@ -115,28 +112,23 @@ fun AnnouncementsScreen(
 
 @Composable
 private fun CategoryFilter(
-    selected: AnnouncementCategoryUi,
-    onSelect: (AnnouncementCategoryUi) -> Unit
+    selected: AnnouncementCategoryUi, onSelect: (AnnouncementCategoryUi) -> Unit
 ) {
     LazyRow(
-        contentPadding        = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(AnnouncementCategoryUi.entries) { cat ->
             val isSelected = cat == selected
             FilterChip(
-                selected = isSelected,
-                onClick  = { onSelect(cat) },
-                label    = {
-                    Text(
-                        text = cat.label,
-                        fontSize = 13.sp
-                    )
-                },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor    = MaterialTheme.colorScheme.primary,
-                    selectedLabelColor        = Color.White
+                selected = isSelected, onClick = { onSelect(cat) }, label = {
+                Text(
+                    text = cat.label, fontSize = 13.sp
                 )
+            }, colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                selectedLabelColor = Color.White
+            )
             )
         }
     }
@@ -144,29 +136,28 @@ private fun CategoryFilter(
 
 @Composable
 private fun AnnouncementCard(
-    item: AnnouncementResponse,
-    modifier: Modifier = Modifier
+    item: AnnouncementResponse, modifier: Modifier = Modifier
 ) {
     val categoryColor = when (item.category) {
         "IMPORTANT" -> Color(0xFFE53935)
-        "NEWS"      -> Color(0xFF1E88E5)
-        "TIPS"      -> Color(0xFFC29800)
-        else        -> MaterialTheme.colorScheme.secondary
+        "NEWS" -> Color(0xFF1E88E5)
+        "TIPS" -> Color(0xFFC29800)
+        else -> MaterialTheme.colorScheme.secondary
     }
 
     Card(
-        modifier  = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFD5E0EC)
         )
     ) {
         Row(
-            modifier            = Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment   = Alignment.Top
+            verticalAlignment = Alignment.Top
         ) {
 
             Box(
@@ -178,54 +169,53 @@ private fun AnnouncementCard(
             ) {
                 if (item.imageUrl != null) {
                     AsyncImage(
-                        model             = item.imageUrl,
+                        model = item.imageUrl,
                         contentDescription = item.title,
-                        contentScale      = ContentScale.Crop,
-                        modifier          = Modifier.fillMaxSize()
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
 
             Column(modifier = Modifier.weight(1f)) {
                 Row(
-                    verticalAlignment     = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Surface(
-                        color = categoryColor.copy(alpha = 0.12f),
-                        shape = RoundedCornerShape(4.dp)
+                        color = categoryColor.copy(alpha = 0.12f), shape = RoundedCornerShape(4.dp)
                     ) {
                         Text(
-                            text       = item.categoryLabel,
-                            fontSize   = 10.sp,
-                            color      = categoryColor,
+                            text = item.categoryLabel,
+                            fontSize = 10.sp,
+                            color = categoryColor,
                             fontWeight = FontWeight.Medium,
-                            modifier   = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                         )
                     }
                     Text(
-                        text     = item.createdAt.take(10),
+                        text = item.createdAt.take(10),
                         fontSize = 10.sp,
-                        color    = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                 }
 
                 Spacer(Modifier.height(4.dp))
 
                 Text(
-                    text       = item.title,
+                    text = item.title,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize   = 14.sp,
-                    maxLines   = 2,
-                    overflow   = TextOverflow.Ellipsis
+                    fontSize = 14.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Spacer(Modifier.height(4.dp))
 
                 Text(
-                    text     = item.description,
+                    text = item.description,
                     fontSize = 12.sp,
-                    color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )

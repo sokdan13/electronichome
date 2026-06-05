@@ -31,16 +31,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(
                 Color(0xFFF57C00).toArgb()
-            ),
-            navigationBarStyle = SystemBarStyle.light(
+            ), navigationBarStyle = SystemBarStyle.light(
                 Color(0xFFFFFFFF).toArgb(),
                 Color(0xFFFFFFFF).toArgb()
             )
         )
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
-//        WindowInsetsControllerCompat(window, window.decorView).apply {
-//            hide(WindowInsetsCompat.Type.NAVIGATION_BARS)
-//        }
+
 
         setContent {
             ElectronichomeTheme {

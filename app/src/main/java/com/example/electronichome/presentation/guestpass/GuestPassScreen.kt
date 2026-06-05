@@ -1,15 +1,46 @@
 package com.example.electronichome.presentation.guestpass
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,7 +68,7 @@ fun GuestPassScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title        = { Text("Гостевой пропуск") },
+                title = { Text("Гостевой пропуск") },
                 windowInsets = WindowInsets.statusBars,
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -45,18 +76,16 @@ fun GuestPassScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 )
             )
-        }
-    ) { padding ->
+        }) { padding ->
         when {
 
             state.isConnectionError -> {
                 NoConnectionPlaceholder(
-                    onRetry = { viewModel.loadPasses() }
-                )
+                    onRetry = { viewModel.loadPasses() })
             }
 
             else -> {
@@ -68,26 +97,22 @@ fun GuestPassScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     AnimatedContent(
-                        targetState = state.activePass,
-                        transitionSpec = {
+                        targetState = state.activePass, transitionSpec = {
                             fadeIn() togetherWith fadeOut()
-                        }
-                    ) { activePass ->
+                        }) { activePass ->
                         if (activePass != null) {
                             ActivePassContent(
                                 token = activePass.token,
                                 secondsLeft = state.secondsLeft,
                                 apartment = apartment,
-                                onCancel = { viewModel.cancelPass() }
-                            )
+                                onCancel = { viewModel.cancelPass() })
                         } else {
                             CreatePassContent(
                                 selectedDuration = state.selectedDuration,
                                 isLoading = state.isLoading,
                                 error = state.error,
                                 onSelectDuration = viewModel::selectDuration,
-                                onCreatePass = { viewModel.createPass(apartment.id) }
-                            )
+                                onCreatePass = { viewModel.createPass(apartment.id) })
                         }
                     }
                 }
@@ -98,19 +123,16 @@ fun GuestPassScreen(
 
 @Composable
 private fun ActivePassContent(
-    token: String,
-    secondsLeft: Long,
-    apartment: ApartmentResponse,
-    onCancel: () -> Unit
+    token: String, secondsLeft: Long, apartment: ApartmentResponse, onCancel: () -> Unit
 ) {
     val qrBitmap = remember(token) { generateQrBitmap(token) }
-    val minutes  = secondsLeft / 60
-    val seconds  = secondsLeft % 60
+    val minutes = secondsLeft / 60
+    val seconds = secondsLeft % 60
 
     val timerColor = when {
         secondsLeft > 300 -> Color(0xFF43A047)
-        secondsLeft > 60  -> Color(0xFFF57C00)
-        else              -> Color(0xFFE53935)
+        secondsLeft > 60 -> Color(0xFFF57C00)
+        else -> Color(0xFFE53935)
     }
 
     Column(
@@ -118,12 +140,10 @@ private fun ActivePassContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text       = "кв. ${apartment.apartment}",
-            fontSize   = 20.sp,
-            fontWeight = FontWeight.Bold
+            text = "кв. ${apartment.apartment}", fontSize = 20.sp, fontWeight = FontWeight.Bold
         )
         Text(
-            text  = "${apartment.street}, д. ${apartment.house}",
+            text = "${apartment.street}, д. ${apartment.house}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -138,9 +158,9 @@ private fun ActivePassContent(
                 .padding(16.dp)
         ) {
             Image(
-                bitmap             = qrBitmap.asImageBitmap(),
+                bitmap = qrBitmap.asImageBitmap(),
                 contentDescription = "QR пропуск",
-                modifier           = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             )
         }
 
@@ -148,21 +168,20 @@ private fun ActivePassContent(
 
 
         Surface(
-            color = timerColor.copy(alpha = 0.12f),
-            shape = RoundedCornerShape(12.dp)
+            color = timerColor.copy(alpha = 0.12f), shape = RoundedCornerShape(12.dp)
         ) {
             Column(
-                modifier            = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
+                modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text       = "%02d:%02d".format(minutes, seconds),
-                    fontSize   = 48.sp,
+                    text = "%02d:%02d".format(minutes, seconds),
+                    fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
-                    color      = timerColor
+                    color = timerColor
                 )
                 Text(
-                    text  = "до истечения пропуска",
+                    text = "до истечения пропуска",
                     fontSize = 12.sp,
                     color = timerColor.copy(alpha = 0.7f)
                 )
@@ -170,18 +189,16 @@ private fun ActivePassContent(
         }
 
         Text(
-            text      = "Покажите QR-код на входе",
-            fontSize  = 13.sp,
-            color     = MaterialTheme.colorScheme.onSurfaceVariant,
+            text = "Покажите QR-код на входе",
+            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(8.dp))
         OutlinedButton(
-            onClick  = onCancel,
-            colors   = ButtonDefaults.outlinedButtonColors(
+            onClick = onCancel, colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = MaterialTheme.colorScheme.error
-            ),
-            modifier = Modifier.fillMaxWidth()
+            ), modifier = Modifier.fillMaxWidth()
         ) {
             Text("Отменить пропуск")
         }
@@ -199,49 +216,44 @@ private fun CreatePassContent(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier            = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         Icon(
-            imageVector        = Icons.Outlined.Lock,
+            imageVector = Icons.Outlined.Lock,
             contentDescription = null,
-            modifier           = Modifier.size(80.dp),
-            tint               = MaterialTheme.colorScheme.primary
+            modifier = Modifier.size(80.dp),
+            tint = MaterialTheme.colorScheme.primary
         )
 
         Text(
-            text       = "Гостевой пропуск",
-            fontSize   = 22.sp,
-            fontWeight = FontWeight.Bold
+            text = "Гостевой пропуск", fontSize = 22.sp, fontWeight = FontWeight.Bold
         )
         Text(
-            text      = "Выберите срок действия пропуска.\nГость покажет QR-код на входе.",
-            fontSize  = 14.sp,
-            color     = MaterialTheme.colorScheme.onSurfaceVariant,
+            text = "Выберите срок действия пропуска.\nГость покажет QR-код на входе.",
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
 
         Spacer(Modifier.height(8.dp))
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            modifier              = Modifier.fillMaxWidth()
+            horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()
         ) {
             PassDuration.entries.forEach { duration ->
                 val isSelected = selectedDuration == duration
                 FilterChip(
                     selected = isSelected,
-                    onClick  = { onSelectDuration(duration) },
-                    label    = {
+                    onClick = { onSelectDuration(duration) },
+                    label = {
                         Text(
-                            text      = duration.label,
-                            textAlign = TextAlign.Center,
-                            fontSize  = 13.sp
+                            text = duration.label, textAlign = TextAlign.Center, fontSize = 13.sp
                         )
                     },
                     modifier = Modifier.weight(1f),
-                    colors   = FilterChipDefaults.filterChipColors(
+                    colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = MaterialTheme.colorScheme.primary,
-                        selectedLabelColor     = Color.White
+                        selectedLabelColor = Color.White
                     )
                 )
             }
@@ -254,17 +266,15 @@ private fun CreatePassContent(
         }
 
         Button(
-            onClick  = onCreatePass,
-            enabled  = !isLoading,
+            onClick = onCreatePass,
+            enabled = !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier    = Modifier.size(20.dp),
-                    strokeWidth = 2.dp,
-                    color       = Color.White
+                    modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.White
                 )
             } else {
                 Text("Выдать пропуск", fontSize = 16.sp)

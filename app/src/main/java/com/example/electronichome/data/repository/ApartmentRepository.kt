@@ -13,18 +13,14 @@ import kotlinx.coroutines.tasks.await
 class ApartmentRepository {
 
     private suspend fun getToken(): String {
-        return FirebaseAuth.getInstance()
-            .currentUser
-            ?.getIdToken(false)
-            ?.await()
-            ?.token
+        return FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.await()?.token
             ?: throw Exception("Пользователь не авторизован")
     }
 
     suspend fun getMyApartments(): Result<List<ApartmentResponse>> = runCatching {
         val token = getToken()
-        val response: ApiResponse<List<ApartmentResponse>> = ApiClient.client
-            .get("${ApiClient.BASE_URL}/apartments/my") {
+        val response: ApiResponse<List<ApartmentResponse>> =
+            ApiClient.client.get("${ApiClient.BASE_URL}/apartments/my") {
                 bearerAuth(token)
             }.body()
         response.data ?: emptyList()
@@ -32,8 +28,8 @@ class ApartmentRepository {
 
     suspend fun addApartment(request: ApartmentRequest): Result<ApartmentResponse> = runCatching {
         val token = getToken()
-        val response: ApiResponse<ApartmentResponse> = ApiClient.client
-            .post("${ApiClient.BASE_URL}/apartments") {
+        val response: ApiResponse<ApartmentResponse> =
+            ApiClient.client.post("${ApiClient.BASE_URL}/apartments") {
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
                 setBody(request)

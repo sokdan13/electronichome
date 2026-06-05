@@ -1,19 +1,43 @@
 package com.example.electronichome.presentation.apartments
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,34 +58,26 @@ fun ApartmentsScreen(
     val state by viewModel.state.collectAsState()
     val primaryId by viewModel.primaryId.collectAsState()
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = state.isLoading,
-        onRefresh = { viewModel.loadApartments() }
-    )
+        refreshing = state.isLoading, onRefresh = { viewModel.loadApartments() })
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Мои квартиры") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Outlined.ArrowBack, null, tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
-                )
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddApartment,
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(Icons.Outlined.Add, null, tint = Color.White)
+    Scaffold(topBar = {
+        TopAppBar(
+            title = { Text("Мои квартиры") }, navigationIcon = {
+            IconButton(onClick = onNavigateBack) {
+                Icon(Icons.Outlined.ArrowBack, null, tint = Color.White)
             }
+        }, colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = Color.White
+        )
+        )
+    }, floatingActionButton = {
+        FloatingActionButton(
+            onClick = onAddApartment, containerColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(Icons.Outlined.Add, null, tint = Color.White)
         }
-    ) { padding ->
+    }) { padding ->
 
         Box(
             modifier = Modifier
@@ -73,8 +89,7 @@ fun ApartmentsScreen(
 
                 state.isConnectionError -> {
                     NoConnectionPlaceholder(
-                        onRetry = { viewModel.loadApartments() }
-                    )
+                        onRetry = { viewModel.loadApartments() })
                 }
 
                 else -> {
@@ -85,14 +100,11 @@ fun ApartmentsScreen(
                     ) {
                         items(state.apartments) { apt ->
                             ApartmentCard(
-                                apt = apt,
-                                isPrimary = apt.id == primaryId,
-                                onSetPrimary = {
+                                apt = apt, isPrimary = apt.id == primaryId, onSetPrimary = {
                                     if (apt.status == "APPROVED") {
                                         viewModel.setPrimary(apt.id)
                                     }
-                                }
-                            )
+                                })
                         }
                     }
                 }
@@ -107,21 +119,20 @@ fun ApartmentsScreen(
         }
     }
 }
+
 @Composable
 fun ApartmentCard(
-    apt: ApartmentResponse,
-    isPrimary: Boolean,
-    onSetPrimary: () -> Unit
+    apt: ApartmentResponse, isPrimary: Boolean, onSetPrimary: () -> Unit
 ) {
     val (statusColor, statusText) = when (apt.status) {
         "APPROVED" -> MaterialTheme.colorScheme.primary to "Подтверждено"
         "REJECTED" -> MaterialTheme.colorScheme.error to "Отклонено"
-        else       -> MaterialTheme.colorScheme.secondary to "Ожидает"
+        else -> MaterialTheme.colorScheme.secondary to "Ожидает"
     }
 
     Card(
-        modifier  = Modifier.fillMaxWidth(),
-        border    = if (isPrimary) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+        modifier = Modifier.fillMaxWidth(),
+        border = if (isPrimary) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFD5E0EC)
@@ -132,23 +143,22 @@ fun ApartmentCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
-                            text       = apt.apartment,
-                            fontSize   = 36.sp,
+                            text = apt.apartment,
+                            fontSize = 36.sp,
                             fontWeight = FontWeight.Bold,
-                            color      = if (apt.status == "APPROVED")
-                                MaterialTheme.colorScheme.primary
+                            color = if (apt.status == "APPROVED") MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(
-                            text     = "кв.",
+                            text = "кв.",
                             fontSize = 14.sp,
-                            color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
                     Text(
-                        text  = buildString {
+                        text = buildString {
                             append("${apt.street}, д. ${apt.house}")
                             apt.building?.let { append(", корп. $it") }
                         },
@@ -156,7 +166,7 @@ fun ApartmentCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text  = "эт. ${apt.floor} · ${apt.city}",
+                        text = "эт. ${apt.floor} · ${apt.city}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -164,14 +174,13 @@ fun ApartmentCard(
 
                 Column(horizontalAlignment = Alignment.End) {
                     Surface(
-                        color = statusColor.copy(alpha = 0.12f),
-                        shape = MaterialTheme.shapes.small
+                        color = statusColor.copy(alpha = 0.12f), shape = MaterialTheme.shapes.small
                     ) {
                         Text(
-                            text     = statusText,
+                            text = statusText,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                            style    = MaterialTheme.typography.labelSmall,
-                            color    = statusColor,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = statusColor,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -183,10 +192,10 @@ fun ApartmentCard(
                             shape = MaterialTheme.shapes.small
                         ) {
                             Text(
-                                text     = "Основная",
+                                text = "Основная",
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                style    = MaterialTheme.typography.labelSmall,
-                                color    = Color.White,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -199,7 +208,7 @@ fun ApartmentCard(
                 HorizontalDivider()
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text  = "Л/С: $it",
+                    text = "Л/С: $it",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -208,8 +217,7 @@ fun ApartmentCard(
             if (apt.status == "APPROVED" && !isPrimary) {
                 Spacer(Modifier.height(10.dp))
                 OutlinedButton(
-                    onClick  = onSetPrimary,
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = onSetPrimary, modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Сделать основной")
                 }

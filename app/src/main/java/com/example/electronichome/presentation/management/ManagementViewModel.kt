@@ -20,16 +20,16 @@ import javax.inject.Inject
 
 data class ManagementUiState(
     val apartments: List<ApartmentResponse> = emptyList(),
-    val requests: List<RequestResponse>     = emptyList(),
-    val isLoading: Boolean                  = false,
-    val error: String?                      = null,
-    val successMessage: String?             = null
+    val requests: List<RequestResponse> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val successMessage: String? = null
 )
 
 @HiltViewModel
 class ManagementViewModel @Inject constructor(
     private val getPendingApartments: GetPendingApartmentsUseCase,
-    private val getAllRequests:  GetAllRequestsUseCase,
+    private val getAllRequests: GetAllRequestsUseCase,
     private val approveApartmentUS: ApproveApartmentUseCase,
     private val rejectApartmentUS: RejectApartmentUseCase,
     private val takeRequestInProgress: TakeRequestInProgressUseCase,
@@ -48,16 +48,17 @@ class ManagementViewModel @Inject constructor(
     fun loadApartments() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            getPendingApartments()
-                .onSuccess { _state.value = _state.value.copy(apartments = it, isLoading = false) }
-                .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
+            getPendingApartments().onSuccess {
+                _state.value = _state.value.copy(apartments = it, isLoading = false)
+            }.onFailure {
+                _state.value = _state.value.copy(isLoading = false, error = it.message)
+            }
         }
     }
 
     fun loadRequests() {
         viewModelScope.launch {
-            getAllRequests()
-                .onSuccess { _state.value = _state.value.copy(requests = it) }
+            getAllRequests().onSuccess { _state.value = _state.value.copy(requests = it) }
                 .onFailure { _state.value = _state.value.copy(error = it.message) }
         }
     }
@@ -65,70 +66,66 @@ class ManagementViewModel @Inject constructor(
     fun approveApartment(id: String, req: ApproveRequest) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            approveApartmentUS(id, req)
-                .onSuccess {
-                    loadApartments()
-                    _state.value = _state.value.copy(successMessage = "Квартира подтверждена")
-                }
-                .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
+            approveApartmentUS(id, req).onSuccess {
+                loadApartments()
+                _state.value = _state.value.copy(successMessage = "Квартира подтверждена")
+            }.onFailure {
+                _state.value = _state.value.copy(isLoading = false, error = it.message)
+            }
         }
     }
 
     fun rejectApartment(id: String, note: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            rejectApartmentUS(id, note)
-                .onSuccess {
-                    loadApartments()
-                    _state.value = _state.value.copy(successMessage = "Квартира отклонена")
-                }
-                .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
+            rejectApartmentUS(id, note).onSuccess {
+                loadApartments()
+                _state.value = _state.value.copy(successMessage = "Квартира отклонена")
+            }.onFailure {
+                _state.value = _state.value.copy(isLoading = false, error = it.message)
+            }
         }
     }
 
     fun takeInProgress(id: String, dueDate: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            takeRequestInProgress(id, dueDate)
-                .onSuccess {
-                    loadRequests()
-                    _state.value = _state.value.copy(
-                        isLoading      = false,
-                        successMessage = "Заявка взята в работу"
-                    )
-                }
-                .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
+            takeRequestInProgress(id, dueDate).onSuccess {
+                loadRequests()
+                _state.value = _state.value.copy(
+                    isLoading = false, successMessage = "Заявка взята в работу"
+                )
+            }.onFailure {
+                _state.value = _state.value.copy(isLoading = false, error = it.message)
+            }
         }
     }
 
     fun markDone(id: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            markRequestDone(id)
-                .onSuccess {
-                    loadRequests()
-                    _state.value = _state.value.copy(
-                        isLoading      = false,
-                        successMessage = "Заявка выполнена"
-                    )
-                }
-                .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
+            markRequestDone(id).onSuccess {
+                loadRequests()
+                _state.value = _state.value.copy(
+                    isLoading = false, successMessage = "Заявка выполнена"
+                )
+            }.onFailure {
+                _state.value = _state.value.copy(isLoading = false, error = it.message)
+            }
         }
     }
+
     fun rejectRequest(id: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            rejectRequestUS(id)
-                .onSuccess {
-                    loadRequests()
-                    _state.value = _state.value.copy(
-                        isLoading      = false,
-                        successMessage = "Заявка отклонена"
-                    )
-                }
-                .onFailure {
-                    _state.value = _state.value.copy(isLoading = false, error = it.message)
-                }
+            rejectRequestUS(id).onSuccess {
+                loadRequests()
+                _state.value = _state.value.copy(
+                    isLoading = false, successMessage = "Заявка отклонена"
+                )
+            }.onFailure {
+                _state.value = _state.value.copy(isLoading = false, error = it.message)
+            }
         }
     }
 

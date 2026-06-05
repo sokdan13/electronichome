@@ -16,13 +16,13 @@ import javax.inject.Singleton
 @Singleton
 class GuestPassRepository @Inject constructor() {
 
-    private suspend fun token() = FirebaseAuth.getInstance()
-        .currentUser?.getIdToken(false)?.await()?.token
-        ?: throw Exception("Не авторизован")
+    private suspend fun token() =
+        FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.await()?.token
+            ?: throw Exception("Не авторизован")
 
     suspend fun createPass(dto: GuestPassCreateDto): Result<GuestPassResponse> = runCatching {
-        val resp: ApiResponse<GuestPassResponse> = ApiClient.client
-            .post("${ApiClient.BASE_URL}/guest-passes") {
+        val resp: ApiResponse<GuestPassResponse> =
+            ApiClient.client.post("${ApiClient.BASE_URL}/guest-passes") {
                 bearerAuth(token())
                 contentType(ContentType.Application.Json)
                 setBody(dto)
@@ -31,17 +31,16 @@ class GuestPassRepository @Inject constructor() {
     }
 
     suspend fun getMyPasses(): Result<List<GuestPassResponse>> = runCatching {
-        val resp: ApiResponse<List<GuestPassResponse>> = ApiClient.client
-            .get("${ApiClient.BASE_URL}/guest-passes/my") {
+        val resp: ApiResponse<List<GuestPassResponse>> =
+            ApiClient.client.get("${ApiClient.BASE_URL}/guest-passes/my") {
                 bearerAuth(token())
             }.body()
         resp.data ?: emptyList()
     }
 
     suspend fun cancelPass(token: String): Result<Unit> = runCatching {
-        ApiClient.client
-            .delete("${ApiClient.BASE_URL}/guest-passes/$token") {
-                bearerAuth(token())
-            }
+        ApiClient.client.delete("${ApiClient.BASE_URL}/guest-passes/$token") {
+            bearerAuth(token())
+        }
     }
 }

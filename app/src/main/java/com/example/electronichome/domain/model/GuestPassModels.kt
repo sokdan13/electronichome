@@ -4,8 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GuestPassCreateDto(
-    val apartmentId: String,
-    val durationMinutes: Int
+    val apartmentId: String, val durationMinutes: Int
 )
 
 @Serializable
@@ -20,7 +19,5 @@ data class GuestPassResponse(
 )
 
 enum class PassDuration(val minutes: Int, val label: String) {
-    FIVE(5,   "5 минут"),
-    THIRTY(30, "30 минут"),
-    HOUR(60,  "1 час")
+    FIVE(5, "5 минут"), THIRTY(30, "30 минут"), HOUR(60, "1 час")
 }

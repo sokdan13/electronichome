@@ -45,8 +45,7 @@ fun RequestsScreen(
     var showForm by remember { mutableStateOf(false) }
 
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = state.isLoading,
-        onRefresh  = viewModel::loadRequests
+        refreshing = state.isLoading, onRefresh = viewModel::loadRequests
     )
 
     LaunchedEffect(state.isSubmitSuccess) {
@@ -67,7 +66,7 @@ fun RequestsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 ),
                 actions = {
@@ -78,10 +77,8 @@ fun RequestsScreen(
                             tint = Color.White
                         )
                     }
-                }
-            )
-        }
-    ) { padding ->
+                })
+        }) { padding ->
 
         Box(
             modifier = Modifier
@@ -93,8 +90,7 @@ fun RequestsScreen(
 
                 state.isConnectionError -> {
                     NoConnectionPlaceholder(
-                        onRetry = { viewModel.loadRequests() }
-                    )
+                        onRetry = { viewModel.loadRequests() })
                 }
 
                 else -> {
@@ -111,8 +107,7 @@ fun RequestsScreen(
                                     isLoading = state.isLoading,
                                     error = state.error,
                                     onSubmit = { dto -> viewModel.submitRequest(dto) },
-                                    onDismiss = { showForm = false }
-                                )
+                                    onDismiss = { showForm = false })
                             }
                         }
 
@@ -144,9 +139,9 @@ fun RequestsScreen(
             }
 
             PullRefreshIndicator(
-                refreshing   = state.isLoading,
-                state        = pullRefreshState,
-                modifier     = Modifier.align(Alignment.TopCenter),
+                refreshing = state.isLoading,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter),
                 contentColor = MaterialTheme.colorScheme.primary
             )
         }
@@ -162,26 +157,23 @@ private fun RequestForm(
     onDismiss: () -> Unit
 ) {
     var selectedCategory by remember { mutableStateOf<RequestCategoryUi?>(null) }
-    var description      by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
 
     Card(
-        modifier  = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFD5E0EC)
         )
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text       = "Новая заявка",
-                fontWeight = FontWeight.SemiBold,
-                fontSize   = 16.sp
+                text = "Новая заявка", fontWeight = FontWeight.SemiBold, fontSize = 16.sp
             )
             Text(
-                text  = buildString {
+                text = buildString {
                     append("кв. ${apartment.apartment} · ${apartment.street}, д. ${apartment.house}")
                     if (!apartment.building.isNullOrBlank()) {
                         append(", корп. ${apartment.building}")
@@ -192,7 +184,7 @@ private fun RequestForm(
             )
 
             Text(
-                text  = "Категория",
+                text = "Категория",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -218,8 +210,7 @@ private fun RequestForm(
                             .clickable { selectedCategory = cat }
                             .padding(horizontal = 14.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text(
                             text = cat.label,
                             fontSize = 13.sp,
@@ -232,12 +223,12 @@ private fun RequestForm(
             }
 
             OutlinedTextField(
-                value       = description,
+                value = description,
                 onValueChange = { description = it },
-                label       = { Text("Описание проблемы (необязательно)") },
-                minLines    = 3,
-                maxLines    = 5,
-                modifier    = Modifier.fillMaxWidth()
+                label = { Text("Описание проблемы (необязательно)") },
+                minLines = 3,
+                maxLines = 5,
+                modifier = Modifier.fillMaxWidth()
             )
 
             error?.let {
@@ -246,30 +237,26 @@ private fun RequestForm(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(
-                    onClick  = onDismiss,
-                    modifier = Modifier.weight(1f)
+                    onClick = onDismiss, modifier = Modifier.weight(1f)
                 ) { Text("Отмена") }
 
                 Button(
-                    onClick  = {
+                    onClick = {
                         selectedCategory?.let { cat ->
                             onSubmit(
                                 RequestCreateDto(
                                     apartmentId = apartment.id,
-                                    category    = cat.key,
-                                    description = description.trim().ifBlank { null }
-                                )
+                                    category = cat.key,
+                                    description = description.trim().ifBlank { null })
                             )
                         }
                     },
-                    enabled  = selectedCategory != null && !isLoading,
+                    enabled = selectedCategory != null && !isLoading,
                     modifier = Modifier.weight(1f)
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
-                            modifier    = Modifier.size(18.dp),
-                            strokeWidth = 2.dp,
-                            color       = Color.White
+                            modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White
                         )
                     } else {
                         Text("Отправить")
@@ -283,16 +270,16 @@ private fun RequestForm(
 @Composable
 private fun RequestCard(req: RequestResponse) {
     val (statusColor, statusIcon) = when (req.status) {
-        "REJECTED"     ->Color(0xFFE52F1E) to R.drawable.ic_reject
+        "REJECTED" -> Color(0xFFE52F1E) to R.drawable.ic_reject
         "PENDING" -> Color(0xFF1E88E5) to R.drawable.ic_in_progress
-        "DONE"        -> Color(0xFF43A047)to R.drawable.ic_done
-        else          -> MaterialTheme.colorScheme.onSurfaceVariant to R.drawable.ic_reject
+        "DONE" -> Color(0xFF43A047) to R.drawable.ic_done
+        else -> MaterialTheme.colorScheme.onSurfaceVariant to R.drawable.ic_reject
     }
 
     val cat = RequestCategoryUi.entries.firstOrNull { it.key == req.category }
 
     Card(
-        modifier  = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFD5E0EC)
@@ -300,41 +287,40 @@ private fun RequestCard(req: RequestResponse) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
-                verticalAlignment      = Alignment.CenterVertically,
-                horizontalArrangement  = Arrangement.SpaceBetween,
-                modifier               = Modifier.fillMaxWidth()
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
-                    verticalAlignment     = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier              = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text       = cat?.label ?: req.category,
+                        text = cat?.label ?: req.category,
                         fontWeight = FontWeight.Medium,
-                        fontSize   = 14.sp,
-                        modifier   = Modifier.weight(1f)
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 Surface(
-                    color = statusColor.copy(alpha = 0.12f),
-                    shape = RoundedCornerShape(6.dp)
+                    color = statusColor.copy(alpha = 0.12f), shape = RoundedCornerShape(6.dp)
                 ) {
                     Row(
-                        modifier              = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        verticalAlignment     = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = statusIcon),
                             contentDescription = null,
-                            tint               = statusColor,
-                            modifier           = Modifier.size(12.dp)
+                            tint = statusColor,
+                            modifier = Modifier.size(12.dp)
                         )
                         Text(
-                            text      = req.statusLabel,
-                            fontSize  = 11.sp,
-                            color     = statusColor,
+                            text = req.statusLabel,
+                            fontSize = 11.sp,
+                            color = statusColor,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -344,7 +330,7 @@ private fun RequestCard(req: RequestResponse) {
             req.description?.let {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text  = it,
+                    text = it,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -353,7 +339,7 @@ private fun RequestCard(req: RequestResponse) {
             req.dueDate?.let {
                 Spacer(Modifier.height(6.dp))
                 Row(
-                    verticalAlignment     = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Icon(
@@ -363,7 +349,7 @@ private fun RequestCard(req: RequestResponse) {
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text  = "Срок: $it",
+                        text = "Срок: $it",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -372,7 +358,7 @@ private fun RequestCard(req: RequestResponse) {
 
             Spacer(Modifier.height(6.dp))
             Text(
-                text  = req.createdAt.take(10),
+                text = req.createdAt.take(10),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
             )

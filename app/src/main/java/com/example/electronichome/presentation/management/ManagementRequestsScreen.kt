@@ -28,14 +28,13 @@ import com.example.electronichome.domain.model.RequestResponse
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun ManagementRequestsScreen(
-    onNavigateBack: () -> Unit,
-    viewModel: ManagementViewModel = hiltViewModel()
+    onNavigateBack: () -> Unit, viewModel: ManagementViewModel = hiltViewModel()
 ) {
-    val state            = viewModel.state.collectAsState().value
+    val state = viewModel.state.collectAsState().value
     val pullRefreshState = rememberPullRefreshState(state.isLoading, viewModel::loadRequests)
 
-    var filterStatus          by remember { mutableStateOf("ALL") }
-    var showInProgressDialog  by remember { mutableStateOf<RequestResponse?>(null) }
+    var filterStatus by remember { mutableStateOf("ALL") }
+    var showInProgressDialog by remember { mutableStateOf<RequestResponse?>(null) }
 
     val filtered = if (filterStatus == "ALL") state.requests
     else state.requests.filter { it.status == filterStatus }
@@ -43,7 +42,7 @@ fun ManagementRequestsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title        = { Text("Заявки жильцов") },
+                title = { Text("Заявки жильцов") },
                 windowInsets = WindowInsets.statusBars,
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -51,12 +50,11 @@ fun ManagementRequestsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 )
             )
-        }
-    ) { padding ->
+        }) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -66,23 +64,23 @@ fun ManagementRequestsScreen(
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
                     LazyRow(
-                        contentPadding        = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         val filters = listOf(
-                            "ALL"         to "Все",
-                            "PENDING"     to "В обработке",
+                            "ALL" to "Все",
+                            "PENDING" to "В обработке",
                             "IN_PROGRESS" to "В работе",
-                            "DONE"        to "Выполнены"
+                            "DONE" to "Выполнены"
                         )
                         items(filters) { (key, label) ->
                             FilterChip(
                                 selected = filterStatus == key,
-                                onClick  = { filterStatus = key },
-                                label    = { Text(label, fontSize = 13.sp) },
-                                colors   = FilterChipDefaults.filterChipColors(
+                                onClick = { filterStatus = key },
+                                label = { Text(label, fontSize = 13.sp) },
+                                colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                    selectedLabelColor     = Color.White
+                                    selectedLabelColor = Color.White
                                 )
                             )
                         }
@@ -91,53 +89,46 @@ fun ManagementRequestsScreen(
 
                 items(filtered) { req ->
                     ManagementRequestCard(
-                        req          = req,
+                        req = req,
                         onInProgress = { showInProgressDialog = req },
-                        onDone       = { viewModel.markDone(req.id) },
-                        onReject     = { viewModel.rejectRequest(req.id) }
-                    )
+                        onDone = { viewModel.markDone(req.id) },
+                        onReject = { viewModel.rejectRequest(req.id) })
                     Spacer(Modifier.height(8.dp))
                 }
             }
 
             PullRefreshIndicator(
-                refreshing   = state.isLoading,
-                state        = pullRefreshState,
-                modifier     = Modifier.align(Alignment.TopCenter),
+                refreshing = state.isLoading,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter),
                 contentColor = MaterialTheme.colorScheme.primary
             )
         }
     }
 
     showInProgressDialog?.let { req ->
-        TakeInProgressDialog(
-            onConfirm = { dueDate ->
-                viewModel.takeInProgress(req.id, dueDate)
-                showInProgressDialog = null
-            },
-            onDismiss = { showInProgressDialog = null }
-        )
+        TakeInProgressDialog(onConfirm = { dueDate ->
+            viewModel.takeInProgress(req.id, dueDate)
+            showInProgressDialog = null
+        }, onDismiss = { showInProgressDialog = null })
     }
 }
 
 @Composable
 private fun ManagementRequestCard(
-    req: RequestResponse,
-    onInProgress: () -> Unit,
-    onDone: () -> Unit,
-    onReject: () -> Unit
+    req: RequestResponse, onInProgress: () -> Unit, onDone: () -> Unit, onReject: () -> Unit
 ) {
     val cat = RequestCategoryUi.entries.firstOrNull { it.key == req.category }
     val (statusColor, statusText) = when (req.status) {
-        "PENDING"     -> MaterialTheme.colorScheme.secondary to "В обработке"
+        "PENDING" -> MaterialTheme.colorScheme.secondary to "В обработке"
         "IN_PROGRESS" -> Color(0xFF1E88E5) to "В работе"
-        "DONE"        -> Color(0xFF43A047) to "Выполнена"
-        "REJECTED"        -> Color(0xFFA04343) to "Отклонена"
-        else          -> MaterialTheme.colorScheme.onSurfaceVariant to req.status
+        "DONE" -> Color(0xFF43A047) to "Выполнена"
+        "REJECTED" -> Color(0xFFA04343) to "Отклонена"
+        else -> MaterialTheme.colorScheme.onSurfaceVariant to req.status
     }
 
     Card(
-        modifier  = Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
@@ -147,32 +138,31 @@ private fun ManagementRequestCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
-                modifier              = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment     = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    verticalAlignment     = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier              = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text       = cat?.label ?: req.category,
+                        text = cat?.label ?: req.category,
                         fontWeight = FontWeight.Medium,
-                        fontSize   = 14.sp,
-                        modifier   = Modifier.weight(1f)
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 Surface(
-                    color = statusColor.copy(alpha = 0.12f),
-                    shape = RoundedCornerShape(6.dp)
+                    color = statusColor.copy(alpha = 0.12f), shape = RoundedCornerShape(6.dp)
                 ) {
                     Text(
-                        text       = statusText,
-                        fontSize   = 11.sp,
-                        color      = statusColor,
+                        text = statusText,
+                        fontSize = 11.sp,
+                        color = statusColor,
                         fontWeight = FontWeight.Medium,
-                        modifier   = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }
@@ -180,7 +170,7 @@ private fun ManagementRequestCard(
             req.description?.let {
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    text  = it,
+                    text = it,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -189,7 +179,7 @@ private fun ManagementRequestCard(
             req.dueDate?.let {
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text  = "Срок: $it",
+                    text = "Срок: $it",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -201,27 +191,27 @@ private fun ManagementRequestCard(
                 "PENDING" -> {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(
-                            onClick  = onReject,
+                            onClick = onReject,
                             modifier = Modifier.weight(1f),
-                            colors   = ButtonDefaults.outlinedButtonColors(
+                            colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = MaterialTheme.colorScheme.error
                             )
                         ) {
                             Text("Отклонить")
                         }
                         Button(
-                            onClick  = onInProgress,
-                            modifier = Modifier.weight(1f)
+                            onClick = onInProgress, modifier = Modifier.weight(1f)
                         ) {
                             Text("В работу")
                         }
                     }
                 }
+
                 "IN_PROGRESS" -> {
                     Button(
-                        onClick  = onDone,
+                        onClick = onDone,
                         modifier = Modifier.fillMaxWidth(),
-                        colors   = ButtonDefaults.buttonColors(
+                        colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF43A047)
                         )
                     ) {
@@ -230,6 +220,7 @@ private fun ManagementRequestCard(
                         Text("Отметить выполненной")
                     }
                 }
+
                 else -> {}
             }
         }
@@ -238,39 +229,32 @@ private fun ManagementRequestCard(
 
 @Composable
 private fun TakeInProgressDialog(
-    onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit
+    onConfirm: (String) -> Unit, onDismiss: () -> Unit
 ) {
     var dueDate by remember { mutableStateOf("") }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Взять в работу") },
-        text  = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text  = "Укажите предварительный срок выполнения",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                OutlinedTextField(
-                    value         = dueDate,
-                    onValueChange = { dueDate = it },
-                    label         = { Text("Дата (ГГГГ-ММ-ДД)") },
-                    placeholder   = { Text("2024-12-31") },
-                    singleLine    = true,
-                    modifier      = Modifier.fillMaxWidth()
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick  = { onConfirm(dueDate) },
-                enabled  = dueDate.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))
-            ) { Text("Подтвердить") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Отмена") }
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("Взять в работу") }, text = {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                text = "Укажите предварительный срок выполнения",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            OutlinedTextField(
+                value = dueDate,
+                onValueChange = { dueDate = it },
+                label = { Text("Дата (ГГГГ-ММ-ДД)") },
+                placeholder = { Text("2024-12-31") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
-    )
+    }, confirmButton = {
+        Button(
+            onClick = { onConfirm(dueDate) },
+            enabled = dueDate.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))
+        ) { Text("Подтвердить") }
+    }, dismissButton = {
+        TextButton(onClick = onDismiss) { Text("Отмена") }
+    })
 }

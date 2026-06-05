@@ -26,9 +26,9 @@ fun RegisterScreen(
     val state by viewModel.state.collectAsState()
 
     var firstName by remember { mutableStateOf("") }
-    var lastName  by remember { mutableStateOf("") }
-    var email     by remember { mutableStateOf("") }
-    var password  by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) onRegisterSuccess()
@@ -102,8 +102,7 @@ fun RegisterScreen(
             Card(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer
-                ),
-                modifier = Modifier.fillMaxWidth()
+                ), modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = state.error!!,

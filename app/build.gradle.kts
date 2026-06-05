@@ -90,6 +90,9 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
     implementation("androidx.compose.ui:ui-graphics")
 
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("io.mockk:mockk:1.13.8")
 
 
 }

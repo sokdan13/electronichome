@@ -18,32 +18,31 @@ import javax.inject.Singleton
 @Singleton
 class ManagementRepository @Inject constructor() {
 
-    private suspend fun token() = FirebaseAuth.getInstance()
-        .currentUser?.getIdToken(false)?.await()?.token
-        ?: throw Exception("Не авторизован")
+    private suspend fun token() =
+        FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.await()?.token
+            ?: throw Exception("Не авторизован")
 
     suspend fun getPendingApartments(): Result<List<ApartmentResponse>> = runCatching {
-        val resp: ApiResponse<List<ApartmentResponse>> = ApiClient.client
-            .get("${ApiClient.BASE_URL}/management/apartments?status=PENDING") {
+        val resp: ApiResponse<List<ApartmentResponse>> =
+            ApiClient.client.get("${ApiClient.BASE_URL}/management/apartments?status=PENDING") {
                 bearerAuth(token())
             }.body()
         resp.data ?: emptyList()
     }
 
     suspend fun getAllApartments(): Result<List<ApartmentResponse>> = runCatching {
-        val resp: ApiResponse<List<ApartmentResponse>> = ApiClient.client
-            .get("${ApiClient.BASE_URL}/management/apartments") {
+        val resp: ApiResponse<List<ApartmentResponse>> =
+            ApiClient.client.get("${ApiClient.BASE_URL}/management/apartments") {
                 bearerAuth(token())
             }.body()
         resp.data ?: emptyList()
     }
 
     suspend fun approveApartment(
-        id: String,
-        req: ApproveRequest
+        id: String, req: ApproveRequest
     ): Result<ApartmentResponse> = runCatching {
-        val resp: ApiResponse<ApartmentResponse> = ApiClient.client
-            .patch("${ApiClient.BASE_URL}/management/apartments/$id/approve") {
+        val resp: ApiResponse<ApartmentResponse> =
+            ApiClient.client.patch("${ApiClient.BASE_URL}/management/apartments/$id/approve") {
                 bearerAuth(token())
                 contentType(ContentType.Application.Json)
                 setBody(req)
@@ -52,8 +51,8 @@ class ManagementRepository @Inject constructor() {
     }
 
     suspend fun rejectApartment(id: String, note: String): Result<ApartmentResponse> = runCatching {
-        val resp: ApiResponse<ApartmentResponse> = ApiClient.client
-            .patch("${ApiClient.BASE_URL}/management/apartments/$id/reject") {
+        val resp: ApiResponse<ApartmentResponse> =
+            ApiClient.client.patch("${ApiClient.BASE_URL}/management/apartments/$id/reject") {
                 bearerAuth(token())
                 contentType(ContentType.Application.Json)
                 setBody(RejectRequest(note))
@@ -62,19 +61,18 @@ class ManagementRepository @Inject constructor() {
     }
 
     suspend fun getAllRequests(): Result<List<RequestResponse>> = runCatching {
-        val resp: ApiResponse<List<RequestResponse>> = ApiClient.client
-            .get("${ApiClient.BASE_URL}/management/requests") {
+        val resp: ApiResponse<List<RequestResponse>> =
+            ApiClient.client.get("${ApiClient.BASE_URL}/management/requests") {
                 bearerAuth(token())
             }.body()
         resp.data ?: emptyList()
     }
 
     suspend fun takeRequestInProgress(
-        id: String,
-        dueDate: String
+        id: String, dueDate: String
     ): Result<RequestResponse> = runCatching {
-        val resp: ApiResponse<RequestResponse> = ApiClient.client
-            .patch("${ApiClient.BASE_URL}/management/requests/$id/in-progress") {
+        val resp: ApiResponse<RequestResponse> =
+            ApiClient.client.patch("${ApiClient.BASE_URL}/management/requests/$id/in-progress") {
                 bearerAuth(token())
                 contentType(ContentType.Application.Json)
                 setBody(TakeInProgressDto(dueDate))
@@ -83,16 +81,16 @@ class ManagementRepository @Inject constructor() {
     }
 
     suspend fun markRequestDone(id: String): Result<RequestResponse> = runCatching {
-        val resp: ApiResponse<RequestResponse> = ApiClient.client
-            .patch("${ApiClient.BASE_URL}/management/requests/$id/done") {
+        val resp: ApiResponse<RequestResponse> =
+            ApiClient.client.patch("${ApiClient.BASE_URL}/management/requests/$id/done") {
                 bearerAuth(token())
             }.body()
         resp.data ?: throw Exception(resp.error)
     }
 
     suspend fun rejectRequest(id: String): Result<RequestResponse> = runCatching {
-        val resp: ApiResponse<RequestResponse> = ApiClient.client
-            .patch("${ApiClient.BASE_URL}/management/requests/$id/reject") {
+        val resp: ApiResponse<RequestResponse> =
+            ApiClient.client.patch("${ApiClient.BASE_URL}/management/requests/$id/reject") {
                 bearerAuth(token())
             }.body()
         resp.data ?: throw Exception(resp.error)

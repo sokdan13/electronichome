@@ -62,18 +62,16 @@ fun MetersScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 )
             )
-        }
-    ) { padding ->
+        }) { padding ->
         when {
 
             state.isConnectionError -> {
                 NoConnectionPlaceholder(
-                    onRetry = { viewModel.loadReadings(apartment.id) }
-                )
+                    onRetry = { viewModel.loadReadings(apartment.id) })
             }
 
             else -> {
@@ -97,22 +95,19 @@ fun MetersScreen(
                         unit = "м³",
                         color = Color(0xFFE53935),
                         value = state.hotWater,
-                        onChange = { viewModel.updateField("hotWater", it) }
-                    )
+                        onChange = { viewModel.updateField("hotWater", it) })
                     MeterSection(
                         title = "Холодная вода",
                         unit = "м³",
                         color = Color(0xFF1E88E5),
                         value = state.coldWater,
-                        onChange = { viewModel.updateField("coldWater", it) }
-                    )
+                        onChange = { viewModel.updateField("coldWater", it) })
                     MeterSection(
                         title = "Отопление",
                         unit = "Гкал",
                         color = Color(0xFFF57C00),
                         value = state.heating,
-                        onChange = { viewModel.updateField("heating", it) }
-                    )
+                        onChange = { viewModel.updateField("heating", it) })
                     Text(
                         text = "Электричество",
                         fontWeight = FontWeight.SemiBold,
@@ -124,22 +119,19 @@ fun MetersScreen(
                         unit = "кВт·ч",
                         color = Color(0xFF8E24AA),
                         value = state.elecDay,
-                        onChange = { viewModel.updateField("elecDay", it) }
-                    )
+                        onChange = { viewModel.updateField("elecDay", it) })
                     MeterSection(
                         title = "Ночь (Т2)",
                         unit = "кВт·ч",
                         color = Color(0xFF5E35B1),
                         value = state.elecNight,
-                        onChange = { viewModel.updateField("elecNight", it) }
-                    )
+                        onChange = { viewModel.updateField("elecNight", it) })
                     MeterSection(
                         title = "Пик (Т3)",
                         unit = "кВт·ч",
                         color = Color(0xFF3949AB),
                         value = state.elecPeak,
-                        onChange = { viewModel.updateField("elecPeak", it) }
-                    )
+                        onChange = { viewModel.updateField("elecPeak", it) })
                     Spacer(Modifier.height(8.dp))
 
                     state.error?.let {
@@ -214,20 +206,20 @@ private fun ApartmentHeader(apartment: ApartmentResponse) {
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             Text(
-                text       = apartment.accountNumber ?: "—",
-                fontSize   = 28.sp,
+                text = apartment.accountNumber ?: "—",
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color      = Color.White
+                color = Color.White
             )
             Text(
-                text     = buildString {
+                text = buildString {
                     append("г. ${apartment.city}, ${apartment.street}, ")
                     append("д. ${apartment.house}")
                     apartment.building?.let { append(", корп. $it") }
                     append(", кв. ${apartment.apartment}")
                 },
                 fontSize = 12.sp,
-                color    = Color.White.copy(alpha = 0.8f),
+                color = Color.White.copy(alpha = 0.8f),
                 modifier = Modifier.padding(top = 2.dp)
             )
         }
@@ -236,10 +228,7 @@ private fun ApartmentHeader(apartment: ApartmentResponse) {
 
 @Composable
 private fun MonthYearPicker(
-    selectedMonth: Int,
-    selectedYear: Int,
-    onMonthChange: (Int) -> Unit,
-    onYearChange: (Int) -> Unit
+    selectedMonth: Int, selectedYear: Int, onMonthChange: (Int) -> Unit, onYearChange: (Int) -> Unit
 ) {
     var showMonthMenu by remember { mutableStateOf(false) }
     val currentYear = java.time.LocalDate.now().year
@@ -253,20 +242,17 @@ private fun MonthYearPicker(
     ) {
         Box(modifier = Modifier.weight(1f)) {
             OutlinedButton(
-                onClick  = { showMonthMenu = true },
-                modifier = Modifier.fillMaxWidth()
+                onClick = { showMonthMenu = true }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(MONTHS.first { it.first == selectedMonth }.second)
                 Spacer(Modifier.width(4.dp))
                 Icon(Icons.Outlined.KeyboardArrowDown, null, Modifier.size(16.dp))
             }
             DropdownMenu(
-                expanded        = showMonthMenu,
-                onDismissRequest = { showMonthMenu = false }
-            ) {
+                expanded = showMonthMenu, onDismissRequest = { showMonthMenu = false }) {
                 MONTHS.forEach { (num, name) ->
                     DropdownMenuItem(
-                        text    = { Text(name) },
+                        text = { Text(name) },
                         onClick = { onMonthChange(num); showMonthMenu = false },
                         leadingIcon = if (num == selectedMonth) ({
                             Icon(Icons.Outlined.Check, null, Modifier.size(16.dp))
@@ -279,20 +265,17 @@ private fun MonthYearPicker(
         var showYearMenu by remember { mutableStateOf(false) }
         Box(modifier = Modifier.weight(1f)) {
             OutlinedButton(
-                onClick  = { showYearMenu = true },
-                modifier = Modifier.fillMaxWidth()
+                onClick = { showYearMenu = true }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(selectedYear.toString())
                 Spacer(Modifier.width(4.dp))
                 Icon(Icons.Outlined.KeyboardArrowDown, null, Modifier.size(16.dp))
             }
             DropdownMenu(
-                expanded        = showYearMenu,
-                onDismissRequest = { showYearMenu = false }
-            ) {
+                expanded = showYearMenu, onDismissRequest = { showYearMenu = false }) {
                 years.forEach { year ->
                     DropdownMenuItem(
-                        text    = { Text(year.toString()) },
+                        text = { Text(year.toString()) },
                         onClick = { onYearChange(year); showYearMenu = false },
                         leadingIcon = if (year == selectedYear) ({
                             Icon(Icons.Outlined.Check, null, Modifier.size(16.dp))
@@ -306,11 +289,7 @@ private fun MonthYearPicker(
 
 @Composable
 private fun MeterSection(
-    title: String,
-    unit: String,
-    color: Color,
-    value: String,
-    onChange: (String) -> Unit
+    title: String, unit: String, color: Color, value: String, onChange: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -327,7 +306,11 @@ private fun MeterSection(
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(text = unit,  fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
+            Text(
+                text = unit,
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            )
         }
         Spacer(Modifier.width(12.dp))
         MeterInput(value = value, color = color, onChange = onChange)
@@ -336,19 +319,17 @@ private fun MeterSection(
 
 @Composable
 private fun MeterInput(
-    value: String,
-    color: Color,
-    onChange: (String) -> Unit
+    value: String, color: Color, onChange: (String) -> Unit
 ) {
     val shape = RoundedCornerShape(10.dp)
     val parts = value.padStart(5, ' ').take(5)
 
     BasicTextField(
-        value         = value,
+        value = value,
         onValueChange = onChange,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-        cursorBrush   = SolidColor(color),
-        singleLine    = true,
+        cursorBrush = SolidColor(color),
+        singleLine = true,
         decorationBox = {
             Row(
                 modifier = Modifier
@@ -359,7 +340,8 @@ private fun MeterInput(
                 horizontalArrangement = Arrangement.spacedBy(3.dp)
             ) {
                 parts.forEachIndexed { index, char ->
-                    val isSeparator = value.contains('.') && index == value.indexOf('.').coerceAtMost(4)
+                    val isSeparator =
+                        value.contains('.') && index == value.indexOf('.').coerceAtMost(4)
                     Box(
                         modifier = Modifier
                             .size(width = 36.dp, height = 44.dp)
@@ -367,36 +349,34 @@ private fun MeterInput(
                             .background(
                                 if (char.isDigit()) color.copy(alpha = 0.1f)
                                 else MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                        contentAlignment = Alignment.Center
+                            ), contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text      = if (char == ' ') "" else char.toString(),
-                            fontSize  = 20.sp,
+                            text = if (char == ' ') "" else char.toString(),
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color     = if (char.isDigit()) color else MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = if (char.isDigit()) color else MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }
                 }
             }
-        }
-    )
+        })
 }
 
 @Composable
 private fun ArchiveSection(readings: List<MeterReadingResponse>) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
-            text       = "Показания прошлых месяцев",
+            text = "Показания прошлых месяцев",
             fontWeight = FontWeight.SemiBold,
-            fontSize   = 15.sp,
-            modifier   = Modifier.padding(bottom = 8.dp)
+            fontSize = 15.sp,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
         if (readings.isEmpty()) {
             Text(
-                text     = "Нет архивных данных",
-                color    = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = "Нет архивных данных",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 13.sp
             )
         } else {
@@ -413,26 +393,25 @@ private fun ArchiveCard(reading: MeterReadingResponse) {
     val monthName = MONTHS.first { it.first == reading.month }.second
 
     Card(
-        modifier  = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(
-                text       = "$monthName ${reading.year}",
+                text = "$monthName ${reading.year}",
                 fontWeight = FontWeight.Medium,
-                fontSize   = 14.sp
+                fontSize = 14.sp
             )
             Spacer(Modifier.height(8.dp))
             Row(
-                modifier                = Modifier.fillMaxWidth(),
-                horizontalArrangement   = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                ArchiveValue("ГВС",  reading.hotWater,  Color(0xFFE53935), "м³")
-                ArchiveValue("ХВС",  reading.coldWater, Color(0xFF1E88E5), "м³")
-                ArchiveValue("Отоп", reading.heating,   Color(0xFFF57C00), "Гкал")
-                ArchiveValue("Т1",   reading.elecDay,   Color(0xFF8E24AA), "кВт")
-                ArchiveValue("Т2",   reading.elecNight, Color(0xFF5E35B1), "кВт")
-                ArchiveValue("Т3",   reading.elecPeak,  Color(0xFF3949AB), "кВт")
+                ArchiveValue("ГВС", reading.hotWater, Color(0xFFE53935), "м³")
+                ArchiveValue("ХВС", reading.coldWater, Color(0xFF1E88E5), "м³")
+                ArchiveValue("Отоп", reading.heating, Color(0xFFF57C00), "Гкал")
+                ArchiveValue("Т1", reading.elecDay, Color(0xFF8E24AA), "кВт")
+                ArchiveValue("Т2", reading.elecNight, Color(0xFF5E35B1), "кВт")
+                ArchiveValue("Т3", reading.elecPeak, Color(0xFF3949AB), "кВт")
             }
         }
     }
@@ -440,19 +419,14 @@ private fun ArchiveCard(reading: MeterReadingResponse) {
 
 @Composable
 private fun ArchiveValue(
-    label: String,
-    value: Double?,
-    color: Color,
-    unit: String
+    label: String, value: Double?, color: Color, unit: String
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = label, fontSize = 10.sp, color = color, fontWeight = FontWeight.Medium)
-        Text(
-            text     = value?.let { "%.1f".format(it) } ?: "—",
+        Text(text = value?.let { "%.1f".format(it) } ?: "—",
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
-            color    = MaterialTheme.colorScheme.onSurface
-        )
+            color = MaterialTheme.colorScheme.onSurface)
         Text(text = unit, fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

@@ -25,8 +25,7 @@ import com.example.electronichome.presentation.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    navController: NavController,
-    viewModel: ApartmentsViewModel = hiltViewModel()
+    navController: NavController, viewModel: ApartmentsViewModel = hiltViewModel()
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -45,17 +44,17 @@ fun HomeScreen(
                 if (primaryApt != null) {
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
-                            text       = primaryApt!!.apartment,
-                            fontSize   = 90.sp,
+                            text = primaryApt!!.apartment,
+                            fontSize = 90.sp,
                             fontWeight = FontWeight.Bold,
-                            color      = Color.White,
+                            color = Color.White,
                             lineHeight = 90.sp
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text     = "квартира",
+                            text = "квартира",
                             fontSize = 18.sp,
-                            color    = Color.White.copy(alpha = 0.85f),
+                            color = Color.White.copy(alpha = 0.85f),
                             modifier = Modifier.padding(bottom = 10.dp)
                         )
                     }
@@ -65,31 +64,28 @@ fun HomeScreen(
                             append("д. ${primaryApt!!.house}")
                             primaryApt!!.building?.let { append(", корп. $it") }
                             append(", эт. ${primaryApt!!.floor}")
-                        },
-                        fontSize = 13.sp,
-                        color    = Color.White.copy(alpha = 0.8f)
+                        }, fontSize = 13.sp, color = Color.White.copy(alpha = 0.8f)
                     )
                     primaryApt!!.accountNumber?.let {
                         Spacer(Modifier.height(3.dp))
                         Text(
-                            text     = "Л/С: $it",
+                            text = "Л/С: $it",
                             fontSize = 13.sp,
-                            color    = Color.White.copy(alpha = 0.7f)
+                            color = Color.White.copy(alpha = 0.7f)
                         )
                     }
                 } else {
                     Text(
-                        text       = "Электронный дом",
-                        fontSize   = 24.sp,
+                        text = "Электронный дом",
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color      = Color.White
+                        color = Color.White
                     )
                     Text(
-                        text     = if (state.apartments.isEmpty())
-                            "Добавьте квартиру в разделе Профиль → Квартиры"
+                        text = if (state.apartments.isEmpty()) "Добавьте квартиру в разделе Профиль → Квартиры"
                         else "Выберите основную квартиру в разделе Квартиры",
                         fontSize = 13.sp,
-                        color    = Color.White.copy(alpha = 0.8f),
+                        color = Color.White.copy(alpha = 0.8f),
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -98,9 +94,9 @@ fun HomeScreen(
         val isApartmentAvailable = primaryApt != null
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text     = "Быстрые действия",
-                style    = MaterialTheme.typography.titleSmall,
-                color    = MaterialTheme.colorScheme.onSurfaceVariant
+                text = "Быстрые действия",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -109,31 +105,27 @@ fun HomeScreen(
                     icon = R.drawable.ic_meters,
                     modifier = Modifier.weight(1f),
                     enabled = isApartmentAvailable,
-                    onClick = { navController.navigate(Screen.Meters.route) }
-                )
+                    onClick = { navController.navigate(Screen.Meters.route) })
                 QuickActionCard(
                     title = "Мои заявки",
                     icon = R.drawable.ic_requests,
                     modifier = Modifier.weight(1f),
                     enabled = isApartmentAvailable,
-                    onClick = { navController.navigate(Screen.Requests.route) }
-                )
+                    onClick = { navController.navigate(Screen.Requests.route) })
             }
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 QuickActionCard(
-                    title   = "Выдача гостевого пропуска",
-                    icon    = R.drawable.ic_qr,
+                    title = "Выдача гостевого пропуска",
+                    icon = R.drawable.ic_qr,
                     modifier = Modifier.weight(1f),
                     enabled = isApartmentAvailable,
-                    onClick = { navController.navigate(Screen.GuestPass.route) }
-                )
+                    onClick = { navController.navigate(Screen.GuestPass.route) })
                 QuickActionCard(
-                    title   = "Мои квартиры",
-                    icon    = R.drawable.ic_apartment,
+                    title = "Мои квартиры",
+                    icon = R.drawable.ic_apartment,
                     modifier = Modifier.weight(1f),
-                    onClick = { navController.navigate(Screen.Apartments.route) }
-                )
+                    onClick = { navController.navigate(Screen.Apartments.route) })
             }
         }
         Card(
@@ -174,6 +166,7 @@ fun HomeScreen(
         }
     }
 }
+
 @Composable
 fun QuickActionCard(
     title: String,
@@ -187,14 +180,14 @@ fun QuickActionCard(
             if (enabled) onClick()
         },
         enabled = enabled,
-        modifier  = modifier.aspectRatio(1f),
+        modifier = modifier.aspectRatio(1f),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFD5E0EC)
         )
     ) {
         Column(
-            modifier            = Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center,
@@ -203,14 +196,14 @@ fun QuickActionCard(
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = null,
-                tint               = Color.Unspecified,
-                modifier           = Modifier.size(100.dp)
+                tint = Color.Unspecified,
+                modifier = Modifier.size(100.dp)
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text       = title,
-                style      = MaterialTheme.typography.labelMedium,
-                textAlign  = TextAlign.Center,
+                text = title,
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Medium
             )
         }

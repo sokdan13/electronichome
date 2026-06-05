@@ -24,11 +24,11 @@ fun AddApartmentScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    var city     by remember { mutableStateOf("") }
-    var street   by remember { mutableStateOf("") }
-    var house    by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
+    var street by remember { mutableStateOf("") }
+    var house by remember { mutableStateOf("") }
     var building by remember { mutableStateOf("") }
-    var floor    by remember { mutableStateOf("") }
+    var floor by remember { mutableStateOf("") }
     var apartment by remember { mutableStateOf("") }
 
     LaunchedEffect(state.isAddSuccess) {
@@ -45,7 +45,7 @@ fun AddApartmentScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White
                 )
             )
@@ -125,11 +125,11 @@ fun AddApartmentScreen(
                 onClick = {
                     viewModel.addApartment(
                         ApartmentRequest(
-                            city      = city.trim(),
-                            street    = street.trim(),
-                            house     = house.trim(),
-                            building  = building.trim().ifBlank { null },
-                            floor     = floor.toIntOrNull() ?: 0,
+                            city = city.trim(),
+                            street = street.trim(),
+                            house = house.trim(),
+                            building = building.trim().ifBlank { null },
+                            floor = floor.toIntOrNull() ?: 0,
                             apartment = apartment.trim()
                         )
                     )
@@ -143,7 +143,11 @@ fun AddApartmentScreen(
                     .height(52.dp)
             ) {
                 if (state.isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.White)
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.White
+                    )
                 } else {
                     Text("Отправить заявку")
                 }

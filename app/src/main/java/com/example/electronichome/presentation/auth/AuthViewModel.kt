@@ -15,10 +15,10 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 data class AuthState(
-    val isLoading: Boolean  = false,
-    val error: String?      = null,
-    val isSuccess: Boolean  = false,
-    val role: UserRole?     = null
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val isSuccess: Boolean = false,
+    val role: UserRole? = null
 )
 
 @HiltViewModel
@@ -39,7 +39,7 @@ class AuthViewModel @Inject constructor(
             _state.value = AuthState(isLoading = true)
             try {
                 auth.signInWithEmailAndPassword(email, password).await()
-                val role     = roleManager.getRole()
+                val role = roleManager.getRole()
                 _state.value = AuthState(isSuccess = true, role = role)
             } catch (e: Exception) {
                 _state.value = AuthState(error = e.localizedMessage ?: "Ошибка входа")

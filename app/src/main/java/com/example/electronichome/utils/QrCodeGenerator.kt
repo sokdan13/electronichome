@@ -7,7 +7,7 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 
 fun generateQrBitmap(content: String, size: Int = 512): Bitmap {
-    val hints  = mapOf(EncodeHintType.MARGIN to 1)
+    val hints = mapOf(EncodeHintType.MARGIN to 1)
     val writer = QRCodeWriter()
     val matrix = writer.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
     val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565)

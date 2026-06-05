@@ -15,13 +15,13 @@ import javax.inject.Singleton
 @Singleton
 class RequestRepository @Inject constructor() {
 
-    private suspend fun token() = FirebaseAuth.getInstance()
-        .currentUser?.getIdToken(false)?.await()?.token
-        ?: throw Exception("Не авторизован")
+    private suspend fun token() =
+        FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.await()?.token
+            ?: throw Exception("Не авторизован")
 
     suspend fun createRequest(dto: RequestCreateDto): Result<RequestResponse> = runCatching {
-        val resp: ApiResponse<RequestResponse> = ApiClient.client
-            .post("${ApiClient.BASE_URL}/requests") {
+        val resp: ApiResponse<RequestResponse> =
+            ApiClient.client.post("${ApiClient.BASE_URL}/requests") {
                 bearerAuth(token())
                 contentType(ContentType.Application.Json)
                 setBody(dto)
@@ -30,8 +30,8 @@ class RequestRepository @Inject constructor() {
     }
 
     suspend fun getMyRequests(): Result<List<RequestResponse>> = runCatching {
-        val resp: ApiResponse<List<RequestResponse>> = ApiClient.client
-            .get("${ApiClient.BASE_URL}/requests/my") {
+        val resp: ApiResponse<List<RequestResponse>> =
+            ApiClient.client.get("${ApiClient.BASE_URL}/requests/my") {
                 bearerAuth(token())
             }.body()
         resp.data ?: emptyList()

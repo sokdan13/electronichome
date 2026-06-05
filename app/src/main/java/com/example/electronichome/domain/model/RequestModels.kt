@@ -6,9 +6,7 @@ import kotlinx.serialization.Serializable
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class RequestCreateDto(
-    val apartmentId: String,
-    val category: String,
-    val description: String? = null
+    val apartmentId: String, val category: String, val description: String? = null
 )
 
 @SuppressLint("UnsafeOptInUsageError")
@@ -28,9 +26,13 @@ data class RequestResponse(
 )
 
 enum class RequestCategoryUi(val key: String, val label: String) {
-    GARBAGE("GARBAGE",        "Некачественное содержание (мусор)"),
-    HOT_COLD_WATER("HOT_COLD_WATER", "Неисправность ГВС/ХВС"),
-    ELECTRICITY("ELECTRICITY", "Неисправность электричества"),
-    ELEVATOR("ELEVATOR",       "Проблемы с лифтом"),
-    CHUTE("CHUTE",             "Засор в мусоропроводе")
+    GARBAGE("GARBAGE", "Некачественное содержание (мусор)"), HOT_COLD_WATER(
+        "HOT_COLD_WATER",
+        "Неисправность ГВС/ХВС"
+    ),
+    ELECTRICITY("ELECTRICITY", "Неисправность электричества"), ELEVATOR(
+        "ELEVATOR",
+        "Проблемы с лифтом"
+    ),
+    CHUTE("CHUTE", "Засор в мусоропроводе")
 }

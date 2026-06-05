@@ -43,12 +43,10 @@ class MetersViewModel @Inject constructor(
 
     fun loadReadings(apartmentId: String) {
         viewModelScope.launch {
-            getReadings(apartmentId)
-                .onSuccess { _state.value = _state.value.copy(readings = it) }
+            getReadings(apartmentId).onSuccess { _state.value = _state.value.copy(readings = it) }
                 .onFailure { e ->
 
-                    val isConnectionProblem =
-                        e is java.io.IOException
+                    val isConnectionProblem = e is java.io.IOException
 
                     _state.value = _state.value.copy(
                         isLoading = false,
@@ -62,33 +60,43 @@ class MetersViewModel @Inject constructor(
     fun updateField(field: String, value: String) {
         if (!value.matches(Regex("^\\d{0,5}(\\.\\d{0,3})?\$"))) return
         _state.value = when (field) {
-            "hotWater"  -> _state.value.copy(hotWater  = value)
+            "hotWater" -> _state.value.copy(hotWater = value)
             "coldWater" -> _state.value.copy(coldWater = value)
-            "heating"   -> _state.value.copy(heating   = value)
-            "elecDay"   -> _state.value.copy(elecDay   = value)
+            "heating" -> _state.value.copy(heating = value)
+            "elecDay" -> _state.value.copy(elecDay = value)
             "elecNight" -> _state.value.copy(elecNight = value)
-            "elecPeak"  -> _state.value.copy(elecPeak  = value)
-            else        -> _state.value
+            "elecPeak" -> _state.value.copy(elecPeak = value)
+            else -> _state.value
         }
     }
 
-    fun setMonth(month: Int) { _state.value = _state.value.copy(selectedMonth = month) }
-    fun setYear(year: Int)   { _state.value = _state.value.copy(selectedYear  = year) }
-    fun toggleArchive()      { _state.value = _state.value.copy(showArchive   = !_state.value.showArchive) }
+    fun setMonth(month: Int) {
+        _state.value = _state.value.copy(selectedMonth = month)
+    }
+
+    fun setYear(year: Int) {
+        _state.value = _state.value.copy(selectedYear = year)
+    }
+
+    fun toggleArchive() {
+        _state.value = _state.value.copy(showArchive = !_state.value.showArchive)
+    }
 
     fun fillFromPrevious() {
         val prev = _state.value.readings.firstOrNull {
-            val prevMonth = if (_state.value.selectedMonth == 1) 12 else _state.value.selectedMonth - 1
-            val prevYear  = if (_state.value.selectedMonth == 1) _state.value.selectedYear - 1 else _state.value.selectedYear
+            val prevMonth =
+                if (_state.value.selectedMonth == 1) 12 else _state.value.selectedMonth - 1
+            val prevYear =
+                if (_state.value.selectedMonth == 1) _state.value.selectedYear - 1 else _state.value.selectedYear
             it.month == prevMonth && it.year == prevYear
         } ?: return
         _state.value = _state.value.copy(
-            hotWater  = prev.hotWater?.toString()  ?: "",
+            hotWater = prev.hotWater?.toString() ?: "",
             coldWater = prev.coldWater?.toString() ?: "",
-            heating   = prev.heating?.toString()   ?: "",
-            elecDay   = prev.elecDay?.toString()   ?: "",
+            heating = prev.heating?.toString() ?: "",
+            elecDay = prev.elecDay?.toString() ?: "",
             elecNight = prev.elecNight?.toString() ?: "",
-            elecPeak  = prev.elecPeak?.toString()  ?: ""
+            elecPeak = prev.elecPeak?.toString() ?: ""
         )
     }
 
@@ -97,23 +105,21 @@ class MetersViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true, error = null)
             val req = MeterReadingRequest(
                 apartmentId = apartmentId,
-                month       = _state.value.selectedMonth,
-                year        = _state.value.selectedYear,
-                hotWater    = _state.value.hotWater.toDoubleOrNull(),
-                coldWater   = _state.value.coldWater.toDoubleOrNull(),
-                heating     = _state.value.heating.toDoubleOrNull(),
-                elecDay     = _state.value.elecDay.toDoubleOrNull(),
-                elecNight   = _state.value.elecNight.toDoubleOrNull(),
-                elecPeak    = _state.value.elecPeak.toDoubleOrNull()
+                month = _state.value.selectedMonth,
+                year = _state.value.selectedYear,
+                hotWater = _state.value.hotWater.toDoubleOrNull(),
+                coldWater = _state.value.coldWater.toDoubleOrNull(),
+                heating = _state.value.heating.toDoubleOrNull(),
+                elecDay = _state.value.elecDay.toDoubleOrNull(),
+                elecNight = _state.value.elecNight.toDoubleOrNull(),
+                elecPeak = _state.value.elecPeak.toDoubleOrNull()
             )
-            submitReading(req)
-                .onSuccess {
-                    loadReadings(apartmentId)
-                    _state.value = _state.value.copy(isLoading = false, isSubmitSuccess = true)
-                }
-                .onFailure {
-                    _state.value = _state.value.copy(isLoading = false, error = it.message)
-                }
+            submitReading(req).onSuccess {
+                loadReadings(apartmentId)
+                _state.value = _state.value.copy(isLoading = false, isSubmitSuccess = true)
+            }.onFailure {
+                _state.value = _state.value.copy(isLoading = false, error = it.message)
+            }
         }
     }
 }

@@ -2,7 +2,6 @@ package com.example.electronichome.presentation.guestpass
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.electronichome.data.repository.GuestPassRepository
 import com.example.electronichome.domain.model.GuestPassCreateDto
 import com.example.electronichome.domain.model.GuestPassResponse
 import com.example.electronichome.domain.model.PassDuration
@@ -12,17 +11,19 @@ import com.example.electronichome.domain.usecase.guestpass.GetMyGuestPassesUseCa
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class GuestPassUiState(
     val passes: List<GuestPassResponse> = emptyList(),
-    val activePass: GuestPassResponse?  = null,
-    val isLoading: Boolean              = false,
-    val error: String?                  = null,
-    val selectedDuration: PassDuration  = PassDuration.THIRTY,
-    val secondsLeft: Long               = 0,
+    val activePass: GuestPassResponse? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val selectedDuration: PassDuration = PassDuration.THIRTY,
+    val secondsLeft: Long = 0,
     val isConnectionError: Boolean = false
 
 )
@@ -39,26 +40,25 @@ class GuestPassViewModel @Inject constructor(
 
     private var countdownJob: Job? = null
 
-    init { loadPasses() }
+    init {
+        loadPasses()
+    }
 
     fun loadPasses() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            getMyPasses()
-                .onSuccess { passes ->
+            getMyPasses().onSuccess { passes ->
                     val active = passes.firstOrNull { it.isValid }
                     _state.value = _state.value.copy(
-                        passes     = passes,
+                        passes = passes,
                         activePass = active,
-                        isLoading  = false,
+                        isLoading = false,
                         isConnectionError = false
                     )
                     active?.let { startCountdown(it.minutesLeft * 60) }
-                }
-                .onFailure { e ->
+                }.onFailure { e ->
 
-                    val isConnectionProblem =
-                        e is java.io.IOException
+                    val isConnectionProblem = e is java.io.IOException
 
                     _state.value = _state.value.copy(
                         isLoading = false,
@@ -78,19 +78,16 @@ class GuestPassViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true, error = null)
             createPass(
                 GuestPassCreateDto(
-                    apartmentId     = apartmentId,
+                    apartmentId = apartmentId,
                     durationMinutes = _state.value.selectedDuration.minutes
                 )
-            )
-                .onSuccess { pass ->
+            ).onSuccess { pass ->
                     _state.value = _state.value.copy(
-                        activePass = pass,
-                        isLoading  = false
+                        activePass = pass, isLoading = false
                     )
                     startCountdown(pass.minutesLeft * 60)
                     loadPasses()
-                }
-                .onFailure {
+                }.onFailure {
                     _state.value = _state.value.copy(isLoading = false, error = it.message)
                 }
         }
@@ -106,8 +103,7 @@ class GuestPassViewModel @Inject constructor(
                 remaining--
             }
             _state.value = _state.value.copy(
-                secondsLeft = 0,
-                activePass  = null
+                secondsLeft = 0, activePass = null
             )
         }
     }
@@ -115,15 +111,12 @@ class GuestPassViewModel @Inject constructor(
     fun cancelPass() {
         val token = _state.value.activePass?.token ?: return
         viewModelScope.launch {
-            cancelPass(token)
-                .onSuccess {
+            cancelPass(token).onSuccess {
                     countdownJob?.cancel()
                     _state.value = _state.value.copy(
-                        activePass  = null,
-                        secondsLeft = 0
+                        activePass = null, secondsLeft = 0
                     )
-                }
-                .onFailure {
+                }.onFailure {
                     _state.value = _state.value.copy(error = it.message)
                 }
         }
