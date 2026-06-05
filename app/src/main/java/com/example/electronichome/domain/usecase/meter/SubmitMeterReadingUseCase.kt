@@ -1,8 +1,9 @@
 package com.example.electronichome.domain.usecase.meter
 
-import com.example.electronichome.data.repository.MeterRepository
+import com.example.electronichome.data.repository.MeterRepositoryImpl
 import com.example.electronichome.domain.model.MeterReadingRequest
 import com.example.electronichome.domain.model.MeterReadingResponse
+import com.example.electronichome.domain.repository.MeterRepository
 import javax.inject.Inject
 
 class SubmitMeterReadingUseCase @Inject constructor(

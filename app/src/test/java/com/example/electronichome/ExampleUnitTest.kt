@@ -1,9 +1,9 @@
 package com.example.electronichome.domain.usecase
 
-import com.example.electronichome.data.repository.AnnouncementRepository
-import com.example.electronichome.data.repository.ApartmentRepository
-import com.example.electronichome.data.repository.GuestPassRepository
-import com.example.electronichome.data.repository.MeterRepository
+import com.example.electronichome.data.repository.AnnouncementRepositoryImpl
+import com.example.electronichome.data.repository.ApartmentRepositoryImpl
+import com.example.electronichome.data.repository.GuestPassRepositoryImpl
+import com.example.electronichome.data.repository.MeterRepositoryImpl
 import com.example.electronichome.domain.model.*
 import com.example.electronichome.domain.usecase.announcement.GetAnnouncementsUseCase
 import com.example.electronichome.domain.usecase.apartment.AddApartmentUseCase
@@ -20,10 +20,10 @@ import org.junit.Test
 class AllUseCasesTest {
 
     // Репозитории
-    private lateinit var apartmentRepository: ApartmentRepository
-    private lateinit var meterRepository: MeterRepository
-    private lateinit var guestPassRepository: GuestPassRepository
-    private lateinit var announcementRepository: AnnouncementRepository
+    private lateinit var apartmentRepository: ApartmentRepositoryImpl
+    private lateinit var meterRepository: MeterRepositoryImpl
+    private lateinit var guestPassRepositoryImpl: GuestPassRepositoryImpl
+    private lateinit var announcementRepositoryImpl: AnnouncementRepositoryImpl
 
     // UseCase
     private lateinit var addApartmentUseCase: AddApartmentUseCase
@@ -35,13 +35,13 @@ class AllUseCasesTest {
     fun setUp() {
         apartmentRepository   = mockk()
         meterRepository       = mockk()
-        guestPassRepository   = mockk()
-        announcementRepository = mockk()
+        guestPassRepositoryImpl   = mockk()
+        announcementRepositoryImpl = mockk()
 
         addApartmentUseCase      = AddApartmentUseCase(apartmentRepository)
         submitMeterReadingUseCase = SubmitMeterReadingUseCase(meterRepository)
-        createGuestPassUseCase   = CreateGuestPassUseCase(guestPassRepository)
-        getAnnouncementsUseCase  = GetAnnouncementsUseCase(announcementRepository)
+        createGuestPassUseCase   = CreateGuestPassUseCase(guestPassRepositoryImpl)
+        getAnnouncementsUseCase  = GetAnnouncementsUseCase(announcementRepositoryImpl)
     }
 
     // ─── AddApartmentUseCase ───────────────────────────────────────────────────
@@ -180,7 +180,7 @@ class AllUseCasesTest {
             expiresAt = "2024-05-01T12:30:00Z", createdAt = "2024-05-01T12:00:00Z",
             isValid = true, minutesLeft = 29
         )
-        coEvery { guestPassRepository.createPass(dto) } returns Result.success(expected)
+        coEvery { guestPassRepositoryImpl.createPass(dto) } returns Result.success(expected)
 
         val result = createGuestPassUseCase(dto)
         assertTrue(result.isSuccess)
@@ -197,7 +197,7 @@ class AllUseCasesTest {
             AnnouncementResponse("2", "Заголовок 2", "Описание 2",
                 "NEWS", "Новости", null, "2024-05-02", "2024-05-02")
         )
-        coEvery { announcementRepository.getAnnouncements(null) } returns Result.success(list)
+        coEvery { announcementRepositoryImpl.getAnnouncements(null) } returns Result.success(list)
 
         val result = getAnnouncementsUseCase(null)
         assertTrue(result.isSuccess)
@@ -210,7 +210,7 @@ class AllUseCasesTest {
             AnnouncementResponse("1", "Заголовок 1", "Описание 1",
                 "IMPORTANT", "Важно", null, "2024-05-01", "2024-05-01")
         )
-        coEvery { announcementRepository.getAnnouncements("IMPORTANT") } returns Result.success(list)
+        coEvery { announcementRepositoryImpl.getAnnouncements("IMPORTANT") } returns Result.success(list)
 
         val result = getAnnouncementsUseCase("IMPORTANT")
         assertTrue(result.isSuccess)
@@ -220,7 +220,7 @@ class AllUseCasesTest {
 
     @Test
     fun `(Объявления) ошибка репозитория возвращает failure`() = runTest {
-        coEvery { announcementRepository.getAnnouncements(any()) } returns
+        coEvery { announcementRepositoryImpl.getAnnouncements(any()) } returns
                 Result.failure(Exception("Нет соединения"))
 
         val result = getAnnouncementsUseCase(null)

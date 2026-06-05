@@ -2,7 +2,6 @@ package com.example.electronichome.presentation.management
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.electronichome.data.repository.ManagementRepository
 import com.example.electronichome.domain.model.ApproveRequest
 import com.example.electronichome.domain.model.ApartmentResponse
 import com.example.electronichome.domain.model.RequestResponse

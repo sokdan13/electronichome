@@ -2,7 +2,6 @@ package com.example.electronichome.presentation.requests
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.electronichome.data.repository.RequestRepository
 import com.example.electronichome.domain.model.RequestCreateDto
 import com.example.electronichome.domain.model.RequestResponse
 import com.example.electronichome.domain.usecase.request.GetMyRequestsUseCase

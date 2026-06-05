@@ -1,8 +1,9 @@
 package com.example.electronichome.domain.usecase.management
 
-import com.example.electronichome.data.repository.ManagementRepository
+import com.example.electronichome.data.repository.ManagementRepositoryImpl
 import com.example.electronichome.domain.model.ApproveRequest
 import com.example.electronichome.domain.model.ApartmentResponse
+import com.example.electronichome.domain.repository.ManagementRepository
 import javax.inject.Inject
 
 class ApproveApartmentUseCase @Inject constructor(

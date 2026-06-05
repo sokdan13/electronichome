@@ -4,6 +4,7 @@ import com.example.electronichome.di.ApiClient
 import com.example.electronichome.domain.model.ApiResponse
 import com.example.electronichome.domain.model.RequestCreateDto
 import com.example.electronichome.domain.model.RequestResponse
+import com.example.electronichome.domain.repository.RequestRepository
 import com.google.firebase.auth.FirebaseAuth
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -13,13 +14,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RequestRepository @Inject constructor() {
+class RequestRepositoryImpl @Inject constructor() : RequestRepository {
 
     private suspend fun token() =
         FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.await()?.token
             ?: throw Exception("Не авторизован")
 
-    suspend fun createRequest(dto: RequestCreateDto): Result<RequestResponse> = runCatching {
+    override suspend fun createRequest(dto: RequestCreateDto): Result<RequestResponse> = runCatching {
         val resp: ApiResponse<RequestResponse> =
             ApiClient.client.post("${ApiClient.BASE_URL}/requests") {
                 bearerAuth(token())
@@ -29,7 +30,7 @@ class RequestRepository @Inject constructor() {
         resp.data ?: throw Exception(resp.error)
     }
 
-    suspend fun getMyRequests(): Result<List<RequestResponse>> = runCatching {
+    override suspend fun getMyRequests(): Result<List<RequestResponse>> = runCatching {
         val resp: ApiResponse<List<RequestResponse>> =
             ApiClient.client.get("${ApiClient.BASE_URL}/requests/my") {
                 bearerAuth(token())
